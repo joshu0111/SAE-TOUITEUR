@@ -1,5 +1,7 @@
 <?php
 
+namespace touitteur\src\classes\touittes;
+
 class Contenir {
     private int $id_touite;
     private int $id_tag;

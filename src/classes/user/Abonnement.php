@@ -1,5 +1,7 @@
 <?php
 
+namespace touitteur\src\classes\user;
+
 class Abonnement {
     private int $id_user;
     private int $id_tag;

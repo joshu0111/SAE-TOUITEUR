@@ -1,5 +1,7 @@
 <?php
 
+namespace touitteur\src\classes\touittes;
+
 class Tag {
     private int $id;
     private string $libelle;

@@ -1,5 +1,7 @@
 <?php
 
+namespace touitteur\src\classes\user;
+
 class User {
     private string $name;
     private string $id_name;

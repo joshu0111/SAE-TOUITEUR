@@ -1,5 +1,7 @@
 <?php
 
+namespace touitteur\src\classes\touittes;
+
 class Touite{
 
     private string $contenu;

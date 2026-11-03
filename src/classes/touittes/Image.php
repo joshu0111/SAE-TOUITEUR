@@ -1,5 +1,7 @@
 <?php
 
+namespace touitteur\src\classes\touittes;
+
 class Image {
     private int $id;
     private string $description;
