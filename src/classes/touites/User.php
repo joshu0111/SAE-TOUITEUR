@@ -1,6 +1,7 @@
 <?php
 
-namespace touiteur\touites\user;
+namespace touiteur\touites;
+
 use touiteur\exceptions\UndefinedAttribute;
 
 class User {
@@ -26,11 +27,11 @@ class User {
         $this->bio = $bio;
     }
 
-    public function __get(string $att): string {
-        if (property_exists($att)){
+    public function __get(string $att) {
+        if (property_exists($this, $att)){
             return  $this->$att;
         }
-        return new UndefinedAttribute();
+        throw new UndefinedAttribute();
     }
 
 }

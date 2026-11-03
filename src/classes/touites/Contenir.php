@@ -1,6 +1,7 @@
 <?php
 
-namespace touiteur\touites\user;
+namespace touiteur\touites;
+
 
 
 class Contenir {

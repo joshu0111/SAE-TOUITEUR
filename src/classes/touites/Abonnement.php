@@ -1,6 +1,6 @@
 <?php
 
-namespace touiteur\touites\user;
+namespace touiteur\touites;
 
 class Abonnement {
     private int $id_user;
