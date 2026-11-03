@@ -1,6 +1,7 @@
 <?php
 
-namespace touitteur\src\classes\touittes;
+namespace touiter\touites\user;
+
 
 class Touite{
 
@@ -10,7 +11,7 @@ class Touite{
 
     private string $datePublication;
 
-    
+
     public function __construct(string $contenu){
         $this->contenu = $contenu;
         $this->note = 0;

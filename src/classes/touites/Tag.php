@@ -1,6 +1,7 @@
 <?php
 
-namespace touitteur\src\classes\touittes;
+namespace touiter\touites\user;
+
 
 class Tag {
     private int $id;

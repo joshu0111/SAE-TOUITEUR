@@ -1,6 +1,7 @@
 <?php
 
-namespace touitteur\src\classes\user;
+namespace touiter\touites\user;
+use touiter\exceptions\UndefinedAttribute;
 
 class User {
     private string $name;
@@ -25,39 +26,11 @@ class User {
         $this->bio = $bio;
     }
 
-    public function getName(): string {
-        return $this->name;
+    public function __get(string $att): string {
+        if (property_exists($att)){
+            return  $this->$att;
+        }
+        return new UndefinedAttribute();
     }
 
-    public function getIdName(): string {
-        return $this->id_name;
-    }
-
-    public function getDateCreation(): string {
-        return $this->date_creation;
-    }
-
-    public function getNbTouites(): int {
-        return $this->nb_touites;
-    }
-
-    public function getNbFollowers(): int {
-        return $this->nb_followers;
-    }
-
-    public function getNbFollowing(): int {
-        return $this->nb_following;
-    }
-
-    public function getListFollowers(): array {
-        return $this->list_followers;
-    }
-
-    public function getListFollowing(): array {
-        return $this->list_following;
-    }
-
-    public function getBio(): string {
-        return $this->bio;
-    }
 }
