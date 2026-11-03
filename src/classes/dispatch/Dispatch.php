@@ -1,8 +1,6 @@
 <?php
 
-namespace touiteur\dispath;
-
-use Yaf\Dispatcher;
+namespace touiteur\dispatch;
 
 class Dispatch {
     protected $actions = array();
@@ -18,7 +16,7 @@ class Dispatch {
      * @param $action_class :  string : correspond au chemin pour aller jusqu'a la methode action qui s'occupe de l'action specifier dans $act
      * @return Dispatcher
      */
-    public function addRoute(string $act, string $action_class) : Dispatcher{
+    public function addRoute(string $act, string $action_class) : Dispatch{
         $this->actions[$act] = $action_class;
         return $this;
     }
