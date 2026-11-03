@@ -14,7 +14,7 @@ class User {
     public function __construct(string $name, string $id_name, ?string $bio = "No bio yet") {
         $this->name = $name;
         $this->id_name = $id_name;
-        $this->date_creation = date('Y-m-d H:i:s');
+        $this->date_creation = date('Y-m-d');
         $this->nb_touites = 0;
         $this->nb_followers = 0;
         $this->nb_following = 0;

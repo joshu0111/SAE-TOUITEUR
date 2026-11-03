@@ -9,10 +9,10 @@ class Touitte{
     private string $datePublication;
 
     
-    public function __construct(string $contenu, int $note, string $date){
+    public function __construct(string $contenu, int $note){
         $this->contenu = $contenu;
         $this->note = $note;
-        $this->datePublication = $date;
+        $this->datePublication = date('d/m/Y H:i:s');
     }
 
     public function get_contenu() : string { return $this->contenu; }
