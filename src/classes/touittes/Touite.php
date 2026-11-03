@@ -1,6 +1,6 @@
 <?php
 
-class Touitte{
+class Touite{
 
     private string $contenu;
 
@@ -9,16 +9,14 @@ class Touitte{
     private string $datePublication;
 
     
-    public function __construct(string $contenu, int $note){
+    public function __construct(string $contenu){
         $this->contenu = $contenu;
-        $this->note = $note;
+        $this->note = 0;
         $this->datePublication = date('d/m/Y H:i:s');
     }
 
     public function get_contenu() : string { return $this->contenu; }
     public function get_note() : int { return $this->note; }
     public function get_date_publication() : string { return $this->datePublication; }
-    
 }
-
 ?>
