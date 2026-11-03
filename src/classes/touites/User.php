@@ -1,7 +1,7 @@
 <?php
 
-namespace touiter\touites\user;
-use touiter\exceptions\UndefinedAttribute;
+namespace touiteur\touites\user;
+use touiteur\exceptions\UndefinedAttribute;
 
 class User {
     private string $name;

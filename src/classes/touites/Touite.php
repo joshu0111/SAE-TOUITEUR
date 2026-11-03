@@ -1,6 +1,6 @@
 <?php
 
-namespace touiter\touites\user;
+namespace touiteur\touites\user;
 
 
 class Touite{

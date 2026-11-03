@@ -1,6 +1,6 @@
 <?php
 
-namespace touiter\dispath;
+namespace touiteur\dispath;
 
 use Yaf\Dispatcher;
 

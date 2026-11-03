@@ -1,14 +1,14 @@
 <?php
 
-namespace touiter\repository;
+namespace touiteur\repository;
 
 use PDO;
 use Exception;
 
-class TouiterRepository
+class TouiteurRepository
 {
     private PDO $pdo;
-    private static ?TouiterRepository $instance = null;
+    private static ?TouiteurRepository $instance = null;
     private static array $config = [];
 
     private function __construct(array $conf)
@@ -29,7 +29,7 @@ class TouiterRepository
         self::$config = $conf;
     }
 
-    public static function getInstance(): TouiterRepository
+    public static function getInstance(): TouiteurRepository
     {
         if (self::$instance === null) {
             if (empty(self::$config)) {

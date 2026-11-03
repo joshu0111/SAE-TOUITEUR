@@ -1,6 +1,6 @@
 <?php
 
-namespace touiter\action;
+namespace touiteur\action;
 
 abstract class Action {
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace touiter\exceptions;
+namespace touiteur\exceptions;
 
 class UndefinedAttribute extends \Exception {
     public function __construct(){
