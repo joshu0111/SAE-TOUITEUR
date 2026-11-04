@@ -22,5 +22,6 @@ $dispatch->addRoute('default', touiteur\action\HomeAction::class);
 $dispatch->addRoute('cree-un-touite', touiteur\action\CreeUnTouite::class);
 $dispatch->addRoute('home',    touiteur\action\HomeAction::class);
 $dispatch->addRoute('test',    touiteur\action\DefaultAction::class);
+$dispatch->addRoute('detail', touiteur\action\TouiteDetailAction::class);
 
 echo $dispatch->run();
