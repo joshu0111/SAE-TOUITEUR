@@ -46,7 +46,7 @@ class TouiteurRepository
         return $this->pdo;
     }
 
-    public function insererTouite(Touite $t, int $idUser): int
+    public function insererTouite(Touite $t, string $idUser): int
     {
         $this->pdo->beginTransaction();
         try {
@@ -80,7 +80,7 @@ class TouiteurRepository
     {
         $st = $this->pdo->prepare(
             "SELECT u.prenom AS auteur,
-                    LOWER(CONCAT(u.prenom, '_', u.nom)) AS handle,
+                    u.id_utilisateur AS handle,
                     DATE_FORMAT(t.date_publication, '%d/%m/%Y %H:%i') AS date,
                     t.contenu AS contenu
              FROM TOUITE t
@@ -98,4 +98,4 @@ class TouiteurRepository
     {
         return (int) $this->pdo->query("SELECT COUNT(*) FROM TOUITE")->fetchColumn();
     }
-    }
+}
