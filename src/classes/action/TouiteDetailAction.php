@@ -1,10 +1,18 @@
 <?php
 namespace touiteur\action;
-use touiteur\render\View;
+
+use touiteur\render\Template;
 
 class TouiteDetailAction extends Action {
     public function execute(): string {
-        $vue = new View(""); 
-        return $vue->render('touite_detail.php');
+        return $this->page('Détail du touite', Template::Detail, [
+            'touite' => [
+                'auteur' => 'Marwane',
+                'handle' => 'marwane',
+                'date' => '04/11/2026 14:00',
+                'contenu' => 'Test de l\'affichage du détail du touite.',
+                'score' => 0
+            ]
+        ]);
     }
 }

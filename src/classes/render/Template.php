@@ -9,6 +9,7 @@ enum Template : string {
     case Layout  = 'layout';
 
     case Home = 'pages/home';
+    case Detail = 'pages/touite_detail';
 
     case Header = 'elements/header';
     case Touite = 'elements/touite';
