@@ -7,7 +7,7 @@
                 <div class="avatar"><?= View::e(strtoupper(substr($follow['nom'], 0, 2))) ?></div>
                 <div class="who">
                     <b><?= View::e($follow['nom']) ?></b>
-                    <i>@<?= View::e($follow['handle']) ?></i>
+                    <i>@<?= View::e($follow['pseudo']) ?></i>
                 </div>
                 <span class="dot" title="en ligne"></span>
             </div>

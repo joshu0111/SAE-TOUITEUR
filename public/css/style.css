@@ -176,6 +176,7 @@
     display: flex; justify-content: space-between; align-items: center;
     padding: 5px 8px; font-family: var(--mono); font-size: 12px;
     background: var(--noir); border: 1px solid #333; cursor: pointer;
+    color: white;
   }
   .tag-item:hover { border-color: var(--vert); color: var(--vert); }
   .tag-item.on { border-color: var(--violet); color: var(--violet); box-shadow: 0 0 8px rgba(191,0,255,.5); }
@@ -200,4 +201,3 @@
 /* Liens utilisés comme boutons */
 a.btn { text-decoration: none; color: var(--texte); }
 .empty { padding: 30px; text-align: center; color: #888; }
-
