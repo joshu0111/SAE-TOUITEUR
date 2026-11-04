@@ -7,10 +7,10 @@ require_once __DIR__ . '/src/loader/ClassLoader.php';
 $loader = new loader\ClassLoader('touiteur\\', __DIR__ . '/src/classes');
 $loader->register();
 
-if (!isset($_SESSION['user'])) {
+if (!isset($_SESSION['user']) || $_SESSION['user']['id'] !== 'josh_r') {
     session_regenerate_id(true);
     $_SESSION['user'] = [
-        'id'      => 1,
+        'id'      => 'josh_r',
         'name'    => 'Josh',
         'id_name' => 'josh_r',
     ];
