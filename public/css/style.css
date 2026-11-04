@@ -526,7 +526,7 @@ footer b {
 
 /* Liens utilisés comme boutons */
 
-<<<<<<< HEAD
+
 a.btn {
     text-decoration: none;
     color: var(--texte);
@@ -609,7 +609,7 @@ a.btn {
     display: inline-block;
     width: 100%;
 }
-=======
+
 
 .touite .actions { align-items: center; flex-wrap: wrap; }
 .touite .vote { display: flex; align-items: center; gap: 6px; margin: 0; }
@@ -619,4 +619,3 @@ a.btn {
 .touite .vote button:disabled { opacity: .5; cursor: not-allowed; }
 .touite .vote button.on:disabled { opacity: 1; }
 .touite .vote button.on.neg { background: var(--violet); color: var(--noir); box-shadow: 0 0 12px var(--violet); }
->>>>>>> dca38a37e9c0da040c0a042c1ba458274f4c15b1

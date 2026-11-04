@@ -9,8 +9,8 @@ class HomeAction extends Action {
     private const TOUITE_PAR_PAGE = 10;
 
     public function execute(): string {
-<<<<<<< HEAD
-=======
+
+
         $tag = trim($_GET['tag'] ?? '');
         return $this->afficher($tag !== '' ? $tag : null);
     }
@@ -23,7 +23,7 @@ class HomeAction extends Action {
         $repo = TouiteurRepository::getInstance();
 
         // Recuperation de la page a afficher en filtrant l'entree
->>>>>>> feature/lister-par-tag
+
         $page = filter_var($_GET['page'] ?? 1, FILTER_VALIDATE_INT, [
             'options' => ['min_range' => 1, 'default' => 1],
         ]);
@@ -33,14 +33,14 @@ class HomeAction extends Action {
             ? $repo->compterTouites()
             : $repo->compterTouitesFiltreParTag($tag);
 
-<<<<<<< HEAD
+
         $pages = max(1, (int) ceil($repo->compterTouites() / self::TOUITE_PAR_PAGE));
 
         $page = min($page, $pages);
 
         $user = $this->getUtilisateurConnecte();                                                   // NOUVEAU
         $visible = $repo->getTouites(self::TOUITE_PAR_PAGE, ($page - 1) * self::TOUITE_PAR_PAGE, $user['id'] ?? null);  // MODIFIÉ
-=======
+
         // Recupere le nombre de page totale, la page actuelle(en verifiant que la page demande est possible a affihcher) et la longueur
         $pages  = max(1, (int) ceil($total / self::TOUITE_PAR_PAGE));
         $page   = min($page, $pages);
@@ -50,7 +50,6 @@ class HomeAction extends Action {
         $touites = $tag === null
             ? $repo->getTouites(self::TOUITE_PAR_PAGE, $offset)
             : $repo->getTouitesParTag($tag, self::TOUITE_PAR_PAGE, $offset);
->>>>>>> feature/lister-par-tag
 
         return $this->page('Accueil', Template::Home, [
             'touites' => $touites,
@@ -61,9 +60,4 @@ class HomeAction extends Action {
             'tag'     => $tag,
         ]);
     }
-<<<<<<< HEAD
-
 }
-=======
-}
->>>>>>> feature/lister-par-tag

@@ -81,19 +81,9 @@ class TouiteurRepository
     {
         // ma_note = evaluation de l'utilisateur connecte (1, -1 ou NULL s'il n'a pas encore evalue)
         $st = $this->pdo->prepare(
-<<<<<<< HEAD
-<<<<<<< HEAD
-            "SELECT u.prenom AS auteur,
-                    LOWER(CONCAT(u.prenom, '_', u.nom)) AS handle,
-=======
-            "SELECT t.id_touite AS id,
-                    u.prenom AS auteur,
-                    u.id_utilisateur AS handle,
->>>>>>> dca38a37e9c0da040c0a042c1ba458274f4c15b1
-=======
+
             "SELECT LOWER(CONCAT(u.prenom, ' ', u.nom)) AS auteur,
                     u.id_utilisateur as  pseudo,
->>>>>>> feature/lister-par-tag
                     DATE_FORMAT(t.date_publication, '%d/%m/%Y %H:%i') AS date,
                     t.contenu AS contenu,
                     t.note AS note,
@@ -110,7 +100,6 @@ class TouiteurRepository
         $st->execute();
         return $st->fetchAll();
     }
-<<<<<<< HEAD
 
     /**
      * Enregistre le like (+1) ou le dislike (-1) d'un utilisateur sur un touite.     // NOUVEAU
@@ -139,11 +128,11 @@ class TouiteurRepository
         }
     }
 
-=======
+
     /**
      * Methode qui permet de compter les touites
      */
->>>>>>> feature/lister-par-tag
+
     public function compterTouites(): int
     {
         return (int) $this->pdo->query("SELECT COUNT(*) FROM TOUITE")->fetchColumn();
