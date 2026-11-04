@@ -4,6 +4,7 @@ namespace touiteur\repository;
 
 use PDO;
 use Exception;
+use touiteur\touites\Touite;
 
 class TouiteurRepository
 {
