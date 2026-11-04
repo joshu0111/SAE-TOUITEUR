@@ -6,14 +6,16 @@ use touiteur\repository\TouiteurRepository;
 
 class CreeUnTouite extends Action {
     public function execute(): string {
-        if ($this->http_method === 'POST') {
+        $user = $this->getUtilisateurConnecte();
+
+        if ($this->http_method === 'POST' && $user !== null) {
             $contenu = trim($_POST['contenu'] ?? '');
             if ($contenu !== '' && mb_strlen($contenu) <= 280) {
                 $touite = new Touite($contenu);
-                $idUser = 1;
-                TouiteurRepository::getInstance()->insererTouite($touite, $idUser);
+                TouiteurRepository::getInstance()->insererTouite($touite, $user['id']);
             }
         }
+
         header('Location: index.php?action=home');
         exit;
     }
