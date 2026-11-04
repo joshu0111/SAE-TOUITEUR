@@ -201,3 +201,12 @@
 a.btn { text-decoration: none; color: var(--texte); }
 .empty { padding: 30px; text-align: center; color: #888; }
 
+
+.touite .actions { align-items: center; flex-wrap: wrap; }
+.touite .vote { display: flex; align-items: center; gap: 6px; margin: 0; }
+.touite .vote .note { font-family: var(--mono); font-size: 12px; min-width: 28px; text-align: center; color: #aaa; }
+.touite .vote .note.pos { color: var(--vert); text-shadow: 0 0 6px var(--vert); }
+.touite .vote .note.neg { color: var(--violet); text-shadow: 0 0 6px var(--violet); }
+.touite .vote button:disabled { opacity: .5; cursor: not-allowed; }
+.touite .vote button.on:disabled { opacity: 1; }
+.touite .vote button.on.neg { background: var(--violet); color: var(--noir); box-shadow: 0 0 12px var(--violet); }
