@@ -45,4 +45,18 @@ class TouiteurRepository
     {
         return $this->pdo;
     }
+
+    public function insererTouite(Touite $t, int $idUser): int
+    {
+        $st = $this->pdo->prepare(
+            "INSERT INTO touite (contenu, note, date_publication, id_user)
+             VALUES (:contenu, :note, NOW(), :user)"
+        );
+        $st->execute([
+            ':contenu' => $t->get_contenu(),
+            ':note'    => $t->get_note(),
+            ':user'    => $idUser,
+        ]);
+        return (int) $this->pdo->lastInsertId();
+    }
 }
