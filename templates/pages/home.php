@@ -24,7 +24,7 @@ use touiteur\render\Template;
                 <div class="empty">Aucun touite.</div>
             <?php endif; ?>
             <?php foreach ($data['touites'] as $touite): ?>
-                <?= View::render(Template::Touite, ['touite' => $touite]) ?>
+                <?= View::render(Template::Touite, ['touite' => $touite, 'page' => $data['page']]) ?>  <!-- MODIFIÉ -->
             <?php endforeach; ?>
         </div>
     </section>
