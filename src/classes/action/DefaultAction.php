@@ -1,6 +1,6 @@
 <?php
 
-namespace touiter\action;
+namespace touiteur\action;
 
 class DefaultAction extends Action {
 

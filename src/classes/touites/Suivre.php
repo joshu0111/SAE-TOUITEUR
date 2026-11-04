@@ -1,6 +1,8 @@
 <?php
 
-namespace touitteur\src\classes\user;
+namespace touiteur\touites;
+
+
 
 class Suivre {
     private int $id_suiveur;
