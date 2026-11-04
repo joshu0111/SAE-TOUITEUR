@@ -1,6 +1,8 @@
 <?php
 
-namespace touitteur\src\classes\touittes;
+namespace touiteur\touites;
+
+
 
 class Image {
     private int $id;

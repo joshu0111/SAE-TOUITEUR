@@ -26,10 +26,10 @@ class ClassLoader {
             if (is_file($path)){
                 require_once($path);
             }else{
-            echo "Impossible de charger la classe {$nomClass}: fichier introuvable.";
+            throw new \Exception("Impossible de charger la classe {$nomClass}: fichier introuvable.");
             }
         }else{
-            echo "Impossible de charger la classe {$nomClass}: mauvais namespace.";
+            throw new \Exception("Impossible de charger la classe {$nomClass}: mauvais namespace.");
         }
     }
 
