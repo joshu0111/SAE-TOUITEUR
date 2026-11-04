@@ -31,4 +31,7 @@ abstract class Action {
      * @return string : correspond au texte
      */
     abstract public function execute() : string;
+    protected function getUtilisateurConnecte(): ?array {
+        return $_SESSION['user'] ?? null;
+    }
 }

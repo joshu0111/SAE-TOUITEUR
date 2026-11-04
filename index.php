@@ -7,6 +7,14 @@ require_once __DIR__ . '/src/loader/ClassLoader.php';
 $loader = new loader\ClassLoader('touiteur\\', __DIR__ . '/src/classes');
 $loader->register();
 
+if (!isset($_SESSION['user'])) {
+    session_regenerate_id(true);
+    $_SESSION['user'] = [
+        'id'      => 1,
+        'name'    => 'Josh',
+        'id_name' => 'josh_r',
+    ];
+}
 // touiteur\repository\TouiteurRepository::setConfig(__DIR__ . '/db.config.ini');
 
 $dispatch = new touiteur\dispatch\Dispatch();
