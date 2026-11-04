@@ -4,7 +4,7 @@
     <div>
         <div class="head">
             <span class="name"><?= View::e($data['touite']['auteur']) ?></span>
-            <span class="handle">@<?= View::e($data['touite']['handle']) ?></span>
+            <span class="handle">@<?= View::e($data['touite']['pseudo']) ?></span>
             <span class="date"><?= View::e($data['touite']['date']) ?></span>
         </div>
         <div class="texte"><?= View::e($data['touite']['contenu']) ?></div>

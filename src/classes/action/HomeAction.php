@@ -9,35 +9,61 @@ class HomeAction extends Action {
     private const TOUITE_PAR_PAGE = 10;
 
     public function execute(): string {
+<<<<<<< HEAD
+=======
+        $tag = trim($_GET['tag'] ?? '');
+        return $this->afficher($tag !== '' ? $tag : null);
+    }
+
+    /**
+        * Affiche la page d'accueil, filtree par tag si $tag n'est pas null.
+        * La meme logique de pagination s'applique dans les deux cas.
+        */
+    private function afficher(?string $tag): string {
+        $repo = TouiteurRepository::getInstance();
+
+        // Recuperation de la page a afficher en filtrant l'entree
+>>>>>>> feature/lister-par-tag
         $page = filter_var($_GET['page'] ?? 1, FILTER_VALIDATE_INT, [
             'options' => ['min_range' => 1, 'default' => 1],
         ]);
 
-        $repo = TouiteurRepository::getInstance();
+        // Recupere le nombre de touites
+        $total = $tag === null
+            ? $repo->compterTouites()
+            : $repo->compterTouitesFiltreParTag($tag);
 
+<<<<<<< HEAD
         $pages = max(1, (int) ceil($repo->compterTouites() / self::TOUITE_PAR_PAGE));
 
         $page = min($page, $pages);
 
         $user = $this->getUtilisateurConnecte();                                                   // NOUVEAU
         $visible = $repo->getTouites(self::TOUITE_PAR_PAGE, ($page - 1) * self::TOUITE_PAR_PAGE, $user['id'] ?? null);  // MODIFIÉ
+=======
+        // Recupere le nombre de page totale, la page actuelle(en verifiant que la page demande est possible a affihcher) et la longueur
+        $pages  = max(1, (int) ceil($total / self::TOUITE_PAR_PAGE));
+        $page   = min($page, $pages);
+        $offset = ($page - 1) * self::TOUITE_PAR_PAGE;
+
+        // Recupere tout les touites
+        $touites = $tag === null
+            ? $repo->getTouites(self::TOUITE_PAR_PAGE, $offset)
+            : $repo->getTouitesParTag($tag, self::TOUITE_PAR_PAGE, $offset);
+>>>>>>> feature/lister-par-tag
 
         return $this->page('Accueil', Template::Home, [
-            'touites' => $visible,
-            'follows' => [
-                ['nom' => 'Neo',      'handle' => 'neo'],
-                ['nom' => 'Trinity',  'handle' => 'trinity'],
-                ['nom' => 'Morpheus', 'handle' => 'morpheus'],
-                ['nom' => 'Tank',     'handle' => 'tank'],
-            ],
-            'tags' => [
-                ['libelle' => 'php',    'nb' => 3],
-                ['libelle' => 'bdd',    'nb' => 2],
-                ['libelle' => 'docker', 'nb' => 1],
-            ],
-            'page'  => $page,
-            'pages' => $pages,
+            'touites' => $touites,
+            'follows' => $repo->getFollows(),
+            'tags'    => $repo->getTags(),
+            'page'    => $page,
+            'pages'   => $pages,
+            'tag'     => $tag,
         ]);
     }
+<<<<<<< HEAD
 
 }
+=======
+}
+>>>>>>> feature/lister-par-tag

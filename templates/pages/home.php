@@ -32,6 +32,7 @@ use touiteur\render\Template;
     <?= View::render(Template::Pagination, [
         'page'  => $data['page'],
         'pages' => $data['pages'],
+        'tag'   => $data['tag'],
     ]) ?>
 </main>
 

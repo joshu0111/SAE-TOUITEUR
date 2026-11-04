@@ -82,6 +82,7 @@ class TouiteurRepository
         // ma_note = evaluation de l'utilisateur connecte (1, -1 ou NULL s'il n'a pas encore evalue)
         $st = $this->pdo->prepare(
 <<<<<<< HEAD
+<<<<<<< HEAD
             "SELECT u.prenom AS auteur,
                     LOWER(CONCAT(u.prenom, '_', u.nom)) AS handle,
 =======
@@ -89,6 +90,10 @@ class TouiteurRepository
                     u.prenom AS auteur,
                     u.id_utilisateur AS handle,
 >>>>>>> dca38a37e9c0da040c0a042c1ba458274f4c15b1
+=======
+            "SELECT LOWER(CONCAT(u.prenom, ' ', u.nom)) AS auteur,
+                    u.id_utilisateur as  pseudo,
+>>>>>>> feature/lister-par-tag
                     DATE_FORMAT(t.date_publication, '%d/%m/%Y %H:%i') AS date,
                     t.contenu AS contenu,
                     t.note AS note,
@@ -105,6 +110,7 @@ class TouiteurRepository
         $st->execute();
         return $st->fetchAll();
     }
+<<<<<<< HEAD
 
     /**
      * Enregistre le like (+1) ou le dislike (-1) d'un utilisateur sur un touite.     // NOUVEAU
@@ -133,8 +139,66 @@ class TouiteurRepository
         }
     }
 
+=======
+    /**
+     * Methode qui permet de compter les touites
+     */
+>>>>>>> feature/lister-par-tag
     public function compterTouites(): int
     {
         return (int) $this->pdo->query("SELECT COUNT(*) FROM TOUITE")->fetchColumn();
     }
+
+    public function compterTouitesFiltreParTag(string $tag): int {
+        $st = $this->pdo->prepare(
+            "SELECT COUNT(*) FROM CONTENIR c
+                INNER JOIN TAG t ON t.id_tag = c.id_tag
+                WHERE t.libelle = :libelle"
+        );
+        $st->bindValue(':libelle', $tag);
+        $st->execute();
+        return (int) $st->fetchColumn();
+    }
+
+    /**
+     * Methode qui retourne les touites filtre par tag
+     */
+    public function getTouitesParTag(string $tag, int $limit, int $offset) : array {
+
+        $st = $this->pdo->prepare(
+            "SELECT LOWER(CONCAT(u.prenom, ' ', u.nom)) AS auteur,
+                    u.id_utilisateur AS pseudo,
+                    DATE_FORMAT(t.date_publication, '%d/%m/%Y %H:%i') AS date,
+                    t.contenu AS contenu
+            FROM TOUITE t
+            JOIN UTILISATEUR u ON u.id_utilisateur = t.id_utilisateur
+            INNER JOIN CONTENIR c ON t.id_touite = c.id_touite
+            INNER JOIN TAG ON c.id_tag = TAG.id_tag
+            WHERE TAG.libelle = :libelle
+            ORDER BY t.date_publication DESC, t.id_touite DESC;
+            LIMIT :limite OFFSET :decalage"
+        );
+        $st->bindValue(':libelle', $tag);
+        $st->bindValue(':limite', $limit, PDO::PARAM_INT);
+        $st->bindValue(':decalage', $offset, PDO::PARAM_INT);
+        $st->execute();
+        return $st->fetchAll();
+    }
+
+    public function getFollows() : array {
+        return $this->pdo->query("SELECT concat(nom, ' ', prenom) as nom,id_utilisateur as pseudo FROM UTILISATEUR")->fetchAll();
+
+    }
+
+    public function getTags() : array  {
+        return $this->pdo->query(
+                "SELECT t.libelle, COUNT(c.id_touite) AS nb
+                 FROM TAG t
+                 LEFT JOIN CONTENIR c ON c.id_tag = t.id_tag
+                 GROUP BY t.id_tag, t.libelle
+                 ORDER BY t.libelle"
+            )->fetchAll();
+    }
+
+
     }
