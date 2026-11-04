@@ -10,7 +10,7 @@ class CreeUnTouite extends Action {
 
         if ($this->http_method === 'POST' && $user !== null) {
             $contenu = trim($_POST['contenu'] ?? '');
-            if ($contenu !== '' && mb_strlen($contenu) <= 280) {
+            if ($contenu !== '' && mb_strlen($contenu) <= 235) {
                 $touite = new Touite($contenu);
                 TouiteurRepository::getInstance()->insererTouite($touite, $user['id']);
             }

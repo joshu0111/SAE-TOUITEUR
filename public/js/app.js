@@ -5,8 +5,8 @@
     if (textarea && count) {
         textarea.addEventListener('input', function () {
             const n = textarea.value.length;
-            count.textContent = n + ' / 280';
-            count.classList.toggle('warn', n > 250);
+            count.textContent = n + ' / 235';
+            count.classList.toggle('warn', n > 210);
         });
     }
 })();

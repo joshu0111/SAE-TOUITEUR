@@ -15,7 +15,7 @@ if (!isset($_SESSION['user'])) {
         'id_name' => 'josh_r',
     ];
 }
-// touiteur\repository\TouiteurRepository::setConfig(__DIR__ . '/db.config.ini');
+touiteur\repository\TouiteurRepository::setConfig(__DIR__ . '/db.config.ini');
 
 $dispatch = new touiteur\dispatch\Dispatch();
 $dispatch->addRoute('default', touiteur\action\HomeAction::class);

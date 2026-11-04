@@ -48,15 +48,54 @@ class TouiteurRepository
 
     public function insererTouite(Touite $t, int $idUser): int
     {
-        $st = $this->pdo->prepare(
-            "INSERT INTO touite (contenu, note, date_publication, id_user)
-             VALUES (:contenu, :note, NOW(), :user)"
-        );
-        $st->execute([
-            ':contenu' => $t->get_contenu(),
-            ':note'    => $t->get_note(),
-            ':user'    => $idUser,
-        ]);
-        return (int) $this->pdo->lastInsertId();
+        $this->pdo->beginTransaction();
+        try {
+            $st = $this->pdo->prepare(
+                "INSERT INTO TOUITE (contenu, date_publication, id_utilisateur)
+                 VALUES (:contenu, NOW(), :user)"
+            );
+            $st->execute([
+                ':contenu' => $t->get_contenu(),
+                ':user'    => $idUser,
+            ]);
+            $id = (int) $this->pdo->lastInsertId();
+
+            $this->pdo->prepare(
+                "UPDATE UTILISATEUR SET nb_touites = nb_touites + 1
+                 WHERE id_utilisateur = :user"
+            )->execute([':user' => $idUser]);
+
+            $this->pdo->commit();
+            return $id;
+        } catch (Exception $e) {
+            $this->pdo->rollBack();
+            throw $e;
+        }
     }
-}
+
+    /**
+     * Renvoie les touites du plus recent au plus ancien, sous la forme attendue par le template touite
+     */
+    public function getTouites(int $limit, int $offset): array
+    {
+        $st = $this->pdo->prepare(
+            "SELECT u.prenom AS auteur,
+                    LOWER(CONCAT(u.prenom, '_', u.nom)) AS handle,
+                    DATE_FORMAT(t.date_publication, '%d/%m/%Y %H:%i') AS date,
+                    t.contenu AS contenu
+             FROM TOUITE t
+             JOIN UTILISATEUR u ON u.id_utilisateur = t.id_utilisateur
+             ORDER BY t.date_publication DESC, t.id_touite DESC
+             LIMIT :limite OFFSET :decalage"
+        );
+        $st->bindValue(':limite', $limit, PDO::PARAM_INT);
+        $st->bindValue(':decalage', $offset, PDO::PARAM_INT);
+        $st->execute();
+        return $st->fetchAll();
+    }
+
+    public function compterTouites(): int
+    {
+        return (int) $this->pdo->query("SELECT COUNT(*) FROM TOUITE")->fetchColumn();
+    }
+    }

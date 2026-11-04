@@ -5,9 +5,9 @@
         <div class="btns"><span>_</span><span>□</span><span>×</span></div>
     </div>
     <div class="panel header">
-        <a class="logo" href="main.php">TOUITEUR<small>.net</small></a>
+        <a class="logo" href="index.php">TOUITEUR<small>.net</small></a>
         <nav class="nav">
-            <a href="main.php?action=home" class="on-link">Accueil</a>
+            <a href="index.php?action=home" class="on-link">Accueil</a>
             <a href="#">Explorer</a>
             <a href="#">Notifications</a>
             <a href="#">Mon profil</a>

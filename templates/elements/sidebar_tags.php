@@ -4,7 +4,7 @@
     <div class="panel">
         <div class="tag-list">
             <?php foreach ($data['tags'] as $tag): ?>
-                <a class="tag-item" href="main.php?action=home&amp;tag=<?= View::e($tag['libelle']) ?>">
+                <a class="tag-item" href="index.php?action=home&amp;tag=<?= View::e($tag['libelle']) ?>">
                     <span>#<?= View::e($tag['libelle']) ?></span>
                     <em><?= (int) $tag['nb'] ?></em>
                 </a>

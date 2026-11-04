@@ -3,6 +3,7 @@
 namespace touiteur\action;
 
 use touiteur\render\Template;
+use touiteur\repository\TouiteurRepository;
 
 class HomeAction extends Action {
     private const TOUITE_PAR_PAGE = 10;
@@ -13,17 +14,16 @@ class HomeAction extends Action {
             'options' => ['min_range' => 1, 'default' => 1],
         ]);
 
-        // Données factices : à remplacer par TouiteurRepository
-        $touites = $this->demoTouites();
+        $repo = TouiteurRepository::getInstance();
 
         // Recupere le nombre de page max
-        $pages = max(1, (int) ceil(count($touites) / self::TOUITE_PAR_PAGE));
+        $pages = max(1, (int) ceil($repo->compterTouites() / self::TOUITE_PAR_PAGE));
 
         // Recupere la page demande en verifiant qu'elle est possible a afficher
         $page = min($page, $pages);
 
-        //  Recuperation de tout les touites dans la plage
-        $visible = array_slice($touites, ($page - 1) * self::TOUITE_PAR_PAGE, self::TOUITE_PAR_PAGE);
+        // Recuperation des touites de la page depuis la base
+        $visible = $repo->getTouites(self::TOUITE_PAR_PAGE, ($page - 1) * self::TOUITE_PAR_PAGE);
 
         return $this->page('Accueil', Template::Home, [
             'touites' => $visible,
