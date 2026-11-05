@@ -190,5 +190,114 @@ class TouiteurRepository
             )->fetchAll();
     }
 
+     /**
+     * Utilisateur par pseudo, ou null s'il n'existe pas
+     */
+    public function getUtilisateur(string $pseudo): ?array
+    {
+        $st = $this->pdo->prepare(
+            "SELECT id_utilisateur, nom, prenom FROM UTILISATEUR WHERE id_utilisateur = :pseudo"
+        );
+        $st->execute([':pseudo' => $pseudo]);
+        return $st->fetch() ?: null;
+    }
+
+    public function compterTouitesParUtilisateur(string $pseudo): int
+    {
+        return $this->compterPour("SELECT COUNT(*) FROM TOUITE WHERE id_utilisateur = :p", $pseudo);
+    }
+
+    public function compterAbonnes(string $pseudo): int
+    {
+        return $this->compterPour("SELECT COUNT(*) FROM SUIVRE WHERE id_suivi = :p", $pseudo);
+    }
+
+    public function compterAbonnements(string $pseudo): int
+    {
+        return $this->compterPour("SELECT COUNT(*) FROM SUIVRE WHERE id_suiveur = :p", $pseudo);
+    }
+
+    private function compterPour(string $sql, string $pseudo): int
+    {
+        $st = $this->pdo->prepare($sql);
+        $st->execute([':p' => $pseudo]);
+        return (int) $st->fetchColumn();
+    }
+
+    /**
+     * true si $suiveur suit $suivi
+     */
+    public function suitUtilisateur(string $suiveur, string $suivi): bool
+    {
+        $st = $this->pdo->prepare(
+            "SELECT 1 FROM SUIVRE WHERE id_suiveur = :suiveur AND id_suivi = :suivi"
+        );
+        $st->execute([':suiveur' => $suiveur, ':suivi' => $suivi]);
+        return $st->fetchColumn() !== false;
+    }
+
+    /**
+     * Utilisateurs suivis par $pseudo, au format de la sidebar (nom, pseudo)
+     */
+    public function getAbonnements(string $pseudo): array
+    {
+        $st = $this->pdo->prepare(
+            "SELECT CONCAT(u.prenom, ' ', u.nom) AS nom, u.id_utilisateur AS pseudo
+             FROM SUIVRE s
+             JOIN UTILISATEUR u ON u.id_utilisateur = s.id_suivi
+             WHERE s.id_suiveur = :p
+             ORDER BY u.prenom, u.nom"
+        );
+        $st->execute([':p' => $pseudo]);
+        return $st->fetchAll();
+    }
+
+    /**
+     * Tags utilises par un utilisateur, du plus frequent au moins frequent
+     */
+    public function getTagsParUtilisateur(string $pseudo): array
+    {
+        $st = $this->pdo->prepare(
+            "SELECT tg.libelle, COUNT(*) AS nb
+             FROM TOUITE t
+             JOIN CONTENIR c ON c.id_touite = t.id_touite
+             JOIN TAG tg ON tg.id_tag = c.id_tag
+             WHERE t.id_utilisateur = :p
+             GROUP BY tg.id_tag, tg.libelle
+             ORDER BY nb DESC, tg.libelle"
+        );
+        $st->execute([':p' => $pseudo]);
+        return $st->fetchAll();
+    }
+
+    /**
+     * Touites d'un utilisateur, memes colonnes que getTouites()
+     * $idUser = utilisateur connecte (pour ma_note), peut etre null
+     */
+    public function getTouitesParUtilisateur(string $pseudo, int $limit, int $offset, ?string $idUser = null): array
+    {
+        $st = $this->pdo->prepare(
+            "SELECT LOWER(CONCAT(u.prenom, ' ', u.nom)) AS auteur,
+                    t.id_touite,
+                    u.id_utilisateur AS pseudo,
+                    DATE_FORMAT(t.date_publication, '%d/%m/%Y %H:%i') AS date,
+                    t.contenu AS contenu,
+                    t.note AS note,
+                    e.valeur AS ma_note
+             FROM TOUITE t
+             JOIN UTILISATEUR u ON u.id_utilisateur = t.id_utilisateur
+             LEFT JOIN EVALUATION e ON e.id_touite = t.id_touite AND e.id_utilisateur = :moi
+             WHERE t.id_utilisateur = :pseudo
+             ORDER BY t.date_publication DESC, t.id_touite DESC
+             LIMIT :limite OFFSET :decalage"
+        );
+        $st->bindValue(':moi', $idUser);
+        $st->bindValue(':pseudo', $pseudo);
+        $st->bindValue(':limite', $limit, PDO::PARAM_INT);
+        $st->bindValue(':decalage', $offset, PDO::PARAM_INT);
+        $st->execute();
+        return $st->fetchAll();
+    }
+
 
     }

@@ -40,17 +40,6 @@ $initiales = mb_strtoupper(mb_substr($u['nom'], 0, 2));
                 <div><b><?= (int) $u['nb_abonnes'] ?></b>abonnés</div>
                 <div><b><?= (int) $u['nb_abonnements'] ?></b>abonnements</div>
             </div>
-
-            <div class="profile-actions">
-                <?php /* TODO : brancher sur les actions follow / unfollow / edit quand elles existeront */ ?>
-                <?php if ($u['est_moi']): ?>
-                    <button type="button">Modifier le profil</button>
-                <?php else: ?>
-                    <button type="button" class="<?= $u['suivi'] ? 'on' : '' ?>">
-                        <?= $u['suivi'] ? 'Abonné ✓' : 'S\'abonner' ?>
-                    </button>
-                <?php endif; ?>
-            </div>
         </div>
     </section>
 
@@ -71,7 +60,7 @@ $initiales = mb_strtoupper(mb_substr($u['nom'], 0, 2));
                 </div>
             <?php endif; ?>
             <?php foreach ($data['touites'] as $touite): ?>
-                <?= View::render(Template::Touite, ['touite' => $touite]) ?>
+                <?= View::render(Template::Touite, ['touite' => $touite, 'page' => $data['page']]) ?>
             <?php endforeach; ?>
         </div>
     </section>
