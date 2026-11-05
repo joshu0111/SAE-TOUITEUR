@@ -1,5 +1,5 @@
 <?php use touiteur\render\View; ?>
-<article class="touite" id="touite-<?= (int) $data['touite']['id'] ?>">
+<article class="touite" id="touite-<?= (int) $data['touite']['id_touite'] ?>">
     <div class="avatar"><?= View::e(strtoupper(substr($data['touite']['auteur'], 0, 2))) ?></div>
     <div>
         <div class="head">
@@ -10,7 +10,7 @@
         <div class="texte"><?= View::e($data['touite']['contenu']) ?></div>
         <div class="actions">
             <?php
-                $idTouite = (int) $data['touite']['id'];
+                $idTouite = (int) $data['touite']['id_touite'];
                 $note     = (int) $data['touite']['note'];
                 $maNote   = $data['touite']['ma_note'] !== null ? (int) $data['touite']['ma_note'] : null;
                 $dejaVote = $maNote !== null;

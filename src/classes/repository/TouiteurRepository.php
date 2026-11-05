@@ -83,6 +83,7 @@ class TouiteurRepository
         $st = $this->pdo->prepare(
 
             "SELECT LOWER(CONCAT(u.prenom, ' ', u.nom)) AS auteur,
+                    t.id_touite,
                     u.id_utilisateur as  pseudo,
                     DATE_FORMAT(t.date_publication, '%d/%m/%Y %H:%i') AS date,
                     t.contenu AS contenu,
