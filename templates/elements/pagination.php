@@ -1,12 +1,10 @@
 <?php
 use touiteur\render\View;
-<<<<<<< HEAD
 $base = $data['base'] ?? 'index.php?action=home';
-=======
+
 
 $tagParam = !empty($data['tag']) ? '&amp;tag=' . urlencode($data['tag']) : '';
 $lien = fn(int $p) => 'index.php?action=home' . $tagParam . '&amp;page=' . $p;
->>>>>>> feature/lister-par-tag
 ?>
 <section class="win">
     <div class="pagination">
