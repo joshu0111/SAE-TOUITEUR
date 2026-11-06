@@ -2,7 +2,7 @@
 
 namespace touiteur\action;
 
-use touiteur\render\{Template, View};
+use touiteur\render\Template;
 use touiteur\exceptions\{IncorrectPassword, PseudoNotFound};
 use touiteur\repository\TouiteurRepository;
 
@@ -18,7 +18,7 @@ class ConnexionAction extends Action{
 
         // Si methode GET recu
         if ($this->http_method==="GET"){
-            // Retour de la page de connexion            header("Location: index.php");
+            // Retour de la page de connexion
             return $this->page("Connexion", Template::Connexion, []);
         }
 
@@ -31,7 +31,7 @@ class ConnexionAction extends Action{
                     $user = $bdd->connexionUser($_POST['pseudo'], $_POST['password']);
                     $_SESSION['user'] = [
                         'id'      => $_POST['pseudo'],
-                        'name'    => $user['nom'] . " " . $user['prenom']
+                        'name'    => $user['prenom'] . " " . $user['nom']
                     ];
                     header("Location: index.php");
                     exit();

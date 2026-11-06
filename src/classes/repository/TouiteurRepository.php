@@ -5,11 +5,10 @@ namespace touiteur\repository;
 use PDO;
 use Exception;
 use PDOException;
-use touiteur\exceptions\IncorrectPassword;
-use touiteur\exceptions\PseudoNotFound;
-use touiteur\touites\Touite;
-use touiteur\touites\Evaluation;
-use touiter\exceptions;
+use touiteur\exceptions\{IncorrectPassword, AlreadyHaveAccount, PseudoAlreadyExists, PseudoNotFound, AuthException};
+use touiteur\touites\{Touite, Evaluation};
+
+
 class TouiteurRepository
 {
     private PDO $pdo;
@@ -327,4 +326,34 @@ class TouiteurRepository
             return $user;
     }
 
+
+    public function inscriptionUser(string $pseudo, string $nom, string $prenom, string $email, string $pass): void {
+        // Le pseudo deja pris
+        $st = $this->pdo->prepare("SELECT COUNT(*) FROM UTILISATEUR WHERE id_utilisateur = :pseudo");
+        $st->execute([':pseudo' => $pseudo]);
+        if ($st->fetchColumn() > 0) {
+            throw new PseudoAlreadyExists();
+        }
+
+        // L'email deja associe a un compte
+        $st = $this->pdo->prepare("SELECT COUNT(*) FROM UTILISATEUR WHERE email = :email");
+        $st->execute([':email' => $email]);
+        if ($st->fetchColumn() > 0) {
+            throw new AlreadyHaveAccount();
+        }
+
+        $hash = password_hash($pass, PASSWORD_DEFAULT, ['cost' => 12]);
+
+        $st = $this->pdo->prepare(
+            "INSERT INTO UTILISATEUR (id_utilisateur, nom, prenom, email, mdp)
+             VALUES (:pseudo, :nom, :prenom, :email, :mdp)"
+        );
+        $st->execute([
+            ':pseudo' => $pseudo,
+            ':nom'    => $nom,
+            ':prenom' => $prenom,
+            ':email'  => $email,
+            ':mdp'    => $hash,
+        ]);
+    }
 }
