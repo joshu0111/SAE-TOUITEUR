@@ -8,7 +8,7 @@
 use touiteur\render\View;
 
 $erreur = $data['erreur'] ?? null;
-$email  = $data['pseudo'] ?? '';
+$pseudo  = $data['pseudo'] ?? '';
 
 ?>
 <section class="win connexion">

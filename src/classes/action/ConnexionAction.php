@@ -18,9 +18,8 @@ class ConnexionAction extends Action{
 
         // Si methode GET recu
         if ($this->http_method==="GET"){
-            // Retour de la page de connexion
-            header("Location: index.php");
-            exit();
+            // Retour de la page de connexion            header("Location: index.php");
+            return $this->page("Connexion", Template::Connexion, []);
         }
 
         // Si methode POST recu
@@ -38,10 +37,10 @@ class ConnexionAction extends Action{
                     exit();
                 } catch (IncorrectPassword $e){
                     // On renvoie la page de connexion avec peudo inconnu
-                    return View::render(Template::Connexion, ['erreur'=> "Pseudo inconnu.", 'pseudo'=>$_POST['pseudo']]);
+                    return $this->page("Connexion", Template::Connexion, ['erreur'=> "Mot de passe incorrect.", 'pseudo'=>$_POST['pseudo']]);
                 } catch (PseudoNotFound $e){
                     // On renvoie la page de connexion avec mdp incorrect
-                    return View::render(Template::Connexion, ['erreur'=> "Mot de passe incorrect."]);
+                    return $this->page("Connexion", Template::Connexion, ['erreur'=> "Pseudo inconnu."]);
                 }
             }
         }

@@ -3,7 +3,7 @@
 namespace touiteur\action;
 
 class DeconnexionAction extends Action{
-    public function execute() : void {
+    public function execute() : string {
         if (isset($_SESSION['user']['id'])){
             unset($_SESSION['user']);
         }

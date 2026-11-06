@@ -321,6 +321,7 @@ class TouiteurRepository
                 throw new IncorrectPassword();
             }
 
+
             // On retire le password du tableau
             unset($user['mdp']);
             return $user;
