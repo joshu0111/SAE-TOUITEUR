@@ -5,8 +5,11 @@ namespace touiteur\repository;
 use PDO;
 use Exception;
 use PDOException;
+use touiteur\exceptions\IncorrectPassword;
+use touiteur\exceptions\PseudoNotFound;
 use touiteur\touites\Touite;
 use touiteur\touites\Evaluation;
+use touiter\exceptions;
 class TouiteurRepository
 {
     private PDO $pdo;
@@ -300,4 +303,27 @@ class TouiteurRepository
     }
 
 
+    public function connexionUser(string $pseudo, string $pass) : array {
+        $st = $this->pdo->prepare(
+                "SELECT id_utilisateur, prenom, nom, mdp
+                 FROM UTILISATEUR
+                 WHERE id_utilisateur = :user"
+            );
+            $st->execute([':user' => $pseudo]);
+            $user = $st->fetch();
+
+            // Si utilisateur inexistant
+            if ($user === false) {
+                throw new PseudoNotFound();
+            }
+            // Si password incorrect
+            if (!password_verify($pass, $user['mdp'])) {
+                throw new IncorrectPassword();
+            }
+
+            // On retire le password du tableau
+            unset($user['mdp']);
+            return $user;
     }
+
+}

@@ -1,21 +1,38 @@
 <?php
 use touiteur\render\View;
 use touiteur\render\Template;
+
+// Utilisateur connecté (null si personne n'est connecté)
+$moi = $_SESSION['user'] ?? null;
 ?>
 <aside>
     <section class="win">
         <div class="titlebar"><span>Mon profil</span></div>
         <div class="panel profile-mini">
-            <div class="avatar v">JR</div>
-            <b style="color:var(--vert)">Josh</b><br>
-            <span style="color:var(--violet);font-family:var(--mono);font-size:12px">@josh_r</span>
+            <?php if ($moi !== null): ?>
+                <div class="avatar v"><?= View::e(strtoupper(substr($moi['name'], 0, 2))) ?></div>
+                <b style="color:var(--vert)"><?= View::e($moi['name']) ?></b><br>
+                <span style="color:var(--violet);font-family:var(--mono);font-size:12px">@<?= View::e($moi['id']) ?></span>
+            <?php else: ?>
+                <div class="empty">Vous n'êtes pas connecté.</div>
+                <a class="btn" href="index.php?action=connexion">Se connecter</a>
+            <?php endif; ?>
         </div>
     </section>
     <?= View::render(Template::SidebarFollows, ['follows' => $data['follows']]) ?>
 </aside>
 
 <main>
-    <?= View::render(Template::Compose) ?>
+    <?php if ($moi !== null): ?>
+        <?= View::render(Template::Compose) ?>
+    <?php else: ?>
+        <section class="win">
+            <div class="titlebar"><span>Rejoindre la conversation</span></div>
+            <div class="panel empty">
+                <a class="btn" href="index.php?action=connexion">Connectez-vous</a> pour publier un touite.
+            </div>
+        </section>
+    <?php endif; ?>
 
     <section class="win">
         <div class="titlebar"><span>Touites affichés</span></div>

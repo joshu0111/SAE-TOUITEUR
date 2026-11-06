@@ -619,3 +619,79 @@ a.btn {
 .touite .vote button:disabled { opacity: .5; cursor: not-allowed; }
 .touite .vote button.on:disabled { opacity: 1; }
 .touite .vote button.on.neg { background: var(--violet); color: var(--noir); box-shadow: 0 0 12px var(--violet); }
+
+
+/* ---------- Page de connexion ---------- */
+
+.connexion {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: 100%;
+    max-width: 420px;
+    margin: 24px auto;
+}
+
+.connexion .field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 12px;
+}
+
+.connexion .field span {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+}
+
+.connexion input {
+    background: var(--noir);
+    color: var(--texte);
+    font-family: var(--mono);
+    font-size: 13px;
+    border: 2px solid;
+    border-color: var(--noir) #6b6b6b #6b6b6b var(--noir);
+    padding: 6px;
+}
+
+.connexion input:focus {
+    outline: 1px solid var(--violet);
+    box-shadow: 0 0 10px rgba(191, 0, 255, .5);
+}
+
+.connexion .row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.connexion .row a {
+    color: var(--violet);
+    font-size: 12px;
+    text-decoration: none;
+}
+
+.connexion .row a:hover {
+    color: var(--vert);
+    text-shadow: 0 0 6px var(--vert);
+}
+
+.alert {
+    padding: 6px 8px;
+    margin-bottom: 12px;
+    font-size: 12px;
+    border: 2px solid;
+}
+
+.alert-error {
+    color: var(--violet);
+    border-color: var(--violet);
+    background: var(--noir);
+    text-shadow: 0 0 6px var(--violet);
+    box-shadow: 0 0 12px rgba(191, 0, 255, .35);
+}

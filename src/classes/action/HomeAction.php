@@ -9,8 +9,6 @@ class HomeAction extends Action {
     private const TOUITE_PAR_PAGE = 10;
 
     public function execute(): string {
-
-
         $tag = trim($_GET['tag'] ?? '');
         return $this->afficher($tag !== '' ? $tag : null);
     }
@@ -34,7 +32,7 @@ class HomeAction extends Action {
             : $repo->compterTouitesFiltreParTag($tag);
 
 
-        $pages = max(1, (int) ceil($repo->compterTouites() / self::TOUITE_PAR_PAGE));
+        $pages = max(1, (int) ceil($total / self::TOUITE_PAR_PAGE));
 
         $page = min($page, $pages);
 

@@ -1,4 +1,9 @@
-<?php use touiteur\render\View; ?>
+<?php
+use touiteur\render\View;
+
+// Utilisateur connecté (null si personne n'est connecté)
+$utilisateur = $_SESSION['user'] ?? null;
+?>
 <header class="win">
     <div class="titlebar">
         <span>Touiteur - Accueil</span>
@@ -10,8 +15,12 @@
             <a href="index.php?action=home" class="on-link">Accueil</a>
             <a href="#">Explorer</a>
             <a href="#">Notifications</a>
-            <a href="index.php?action=profil">Mon profil</a>
-            <a href="#">Déconnexion</a>
+            <?php if ($utilisateur !== null): ?>
+                <a href="index.php?action=profil">Mon profil</a>
+                <a href="index.php?action=deconnexion">Déconnexion</a>
+            <?php else: ?>
+                <a href="index.php?action=connexion">Connexion</a>
+            <?php endif; ?>
         </nav>
         <input class="search" type="search" placeholder="Rechercher #tag ou @user">
     </div>
