@@ -98,4 +98,17 @@ class TouiteurRepository
     {
         return (int) $this->pdo->query("SELECT COUNT(*) FROM TOUITE")->fetchColumn();
     }
+
+    public function getTouiteById(int $id): ?array {
+    $query = "SELECT t.id_touite, t.texte, t.date_t, t.score, u.nom AS auteur, u.handle 
+              FROM touite t 
+              INNER JOIN user u ON t.id_user = u.id_user 
+              WHERE t.id_touite = :id";
+
+    $stmt = $this->pdo->prepare($query);
+    $stmt->execute([':id' => $id]);
+
+    $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+    return $row ?: null;
+}
 }
