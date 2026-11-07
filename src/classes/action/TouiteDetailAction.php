@@ -2,17 +2,19 @@
 namespace touiteur\action;
 
 use touiteur\render\Template;
+use touiteur\repository\TouiteurRepository;
 
 class TouiteDetailAction extends Action {
     public function execute(): string {
+        $id = filter_var($_GET['id'] ?? 1, FILTER_VALIDATE_INT, [
+            'options' => ['min_range' => 1, 'default' => 1]
+        ]);
+
+        $repo = TouiteurRepository::getInstance();
+        $touite = $repo->getTouiteById($id);
+
         return $this->page('Détail du touite', Template::Detail, [
-            'touite' => [
-                'auteur' => 'Marwane',
-                'handle' => 'marwane',
-                'date' => '04/11/2026 14:00',
-                'contenu' => 'Test de l\'affichage du détail du touite.',
-                'score' => 0
-            ]
+            'touite' => $touite
         ]);
     }
 }

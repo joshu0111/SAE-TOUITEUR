@@ -10,6 +10,9 @@ enum Template : string {
 
     case Home = 'pages/home';
     case Detail = 'pages/touite_detail';
+    case Profil = 'pages/profil';
+    case Connexion = 'pages/connexion';
+    case Inscription = 'pages/inscription';
 
     case Header = 'elements/header';
     case Touite = 'elements/touite';
