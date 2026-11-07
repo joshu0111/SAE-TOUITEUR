@@ -141,19 +141,23 @@ class TouiteurRepository
         return (int) $this->pdo->query("SELECT COUNT(*) FROM TOUITE")->fetchColumn();
     }
 
-    public function getTouiteById(int $id): ?array {
-    $query = "SELECT t.id_touite, t.texte, t.date_t, t.score, u.nom AS auteur, u.handle 
-              FROM touite t 
-              INNER JOIN user u ON t.id_user = u.id_user 
-              WHERE t.id_touite = :id";
-
-    $stmt = $this->pdo->prepare($query);
-    $stmt->execute([':id' => $id]);
-
-    $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+    public function getTouiteById(int $id): ?array
+{
+    $st = $this->pdo->prepare(
+        "SELECT LOWER(CONCAT(u.prenom, ' ', u.nom)) AS auteur,
+                t.id_touite,
+                u.id_utilisateur AS pseudo,
+                DATE_FORMAT(t.date_publication, '%d/%m/%Y %H:%i') AS date,
+                t.contenu AS contenu
+         FROM TOUITE t
+         JOIN UTILISATEUR u ON u.id_utilisateur = t.id_utilisateur
+         WHERE t.id_touite = :id"
+    );
+    $st->execute([':id' => $id]);
+    $row = $st->fetch();
     return $row ?: null;
 }
-}
+
     public function compterTouitesFiltreParTag(string $tag): int {
         $st = $this->pdo->prepare(
             "SELECT COUNT(*) FROM CONTENIR c

@@ -1,19 +1,19 @@
 <?php
+
 namespace touiteur\action;
 
-use touiteur\render\Template;
 use touiteur\repository\TouiteurRepository;
+use touiteur\render\Template;
 
-class TouiteDetailAction extends Action {
-    public function execute(): string {
-        $id = filter_var($_GET['id'] ?? 1, FILTER_VALIDATE_INT, [
-            'options' => ['min_range' => 1, 'default' => 1]
-        ]);
-
+class TouiteDetailAction extends Action
+{
+    public function execute(): string
+    {
+        $id = (int) ($_GET['id_touite'] ?? $_GET['id'] ?? 1);
         $repo = TouiteurRepository::getInstance();
         $touite = $repo->getTouiteById($id);
 
-        return $this->page('Détail du touite', Template::Detail, [
+        return $this->page("Détail du touite", Template::Detail, [
             'touite' => $touite
         ]);
     }
