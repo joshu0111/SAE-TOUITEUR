@@ -4,7 +4,6 @@ namespace touiteur\repository;
 
 use PDO;
 use Exception;
-use PDOException;
 use touiteur\exceptions\{IncorrectPassword, AlreadyHaveAccount, PseudoAlreadyExists, PseudoNotFound, AuthException};
 use touiteur\touites\{Touite, Evaluation};
 
@@ -67,6 +66,8 @@ class TouiteurRepository
             ]);
             $id = (int) $this->pdo->lastInsertId();
 
+            $this->associerTags($id, $t->getTags());
+
             $this->pdo->prepare(
                 "UPDATE UTILISATEUR SET nb_touites = nb_touites + 1
                  WHERE id_utilisateur = :user"
@@ -77,6 +78,35 @@ class TouiteurRepository
         } catch (Exception $e) {
             $this->pdo->rollBack();
             throw $e;
+        }
+    }
+
+    /**
+     * Methode qui permet d'associer les tags fournis en prarametres a un touites
+    */
+    private function associerTags(int $idTouite, array $tags): void
+    {
+        if (empty($tags)) {
+            return;
+        }
+
+        // Cree le tag s'il n'existe pas, sinon recupere son id
+        $creerTag = $this->pdo->prepare(
+            "INSERT INTO TAG (libelle) VALUES (:libelle)
+             ON DUPLICATE KEY UPDATE id_tag = LAST_INSERT_ID(id_tag)"
+        );
+
+        // On lie les tags au touite
+        $lier = $this->pdo->prepare(
+            "INSERT INTO CONTENIR (id_touite, id_tag) VALUES (:touite, :tag)"
+        );
+
+        // On recupere/ajoute le tag et le lie a son touite sur tout les tags fournis en parametres
+        foreach ($tags as $libelle) {
+            $creerTag->execute([':libelle' => $libelle]);
+            $idTag = (int) $this->pdo->lastInsertId();
+
+            $lier->execute([':touite' => $idTouite, ':tag' => $idTag]);
         }
     }
 

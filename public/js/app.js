@@ -1,3 +1,4 @@
+
 (function () {
     const textarea = document.getElementById('newTouite');
     const count = document.getElementById('count');
@@ -10,22 +11,28 @@
     }
 })();
 
-
-
 (function () {
     const input      = document.getElementById('imageInput');
     const drop       = document.getElementById('imageDrop');
     const preview    = document.getElementById('imagePreview');
     const previewImg = document.getElementById('imagePreviewImg');
+    const status     = document.getElementById('imageStatus');
     const remove     = document.getElementById('imageRemove');
-    if (!input || !drop) return;
+    if (!input || !drop || !preview || !previewImg || !remove) return;
 
     const TAILLE_MAX = 2 * 1024 * 1024; // 2 Mo, comme côté PHP
 
+    function formaterTaille(octets) {
+        if (octets < 1024) return octets + ' o';
+        if (octets < 1024 * 1024) return Math.round(octets / 1024) + ' Ko';
+        return (octets / (1024 * 1024)).toFixed(1) + ' Mo';
+    }
+
     function afficherApercu(file) {
         if (!file) return;
+
         if (!file.type.startsWith('image/')) {
-            alert('Ce fichier n\'est pas une image.');
+            alert("Ce fichier n'est pas une image.");
             input.value = '';
             return;
         }
@@ -34,7 +41,11 @@
             input.value = '';
             return;
         }
+
         previewImg.src = URL.createObjectURL(file);
+        if (status) {
+            status.textContent = '✓ Image prête : ' + file.name + ' (' + formaterTaille(file.size) + ')';
+        }
         preview.hidden = false;
         drop.hidden = true;
     }
@@ -43,7 +54,6 @@
         afficherApercu(input.files[0]);
     });
 
-    // Glisser-déposer
     drop.addEventListener('dragover', function (e) {
         e.preventDefault();
         drop.classList.add('dragover');
@@ -60,11 +70,11 @@
         }
     });
 
-    // Retirer l'image
     remove.addEventListener('click', function () {
         input.value = '';
         URL.revokeObjectURL(previewImg.src);
         previewImg.removeAttribute('src');
+        if (status) status.textContent = '';
         preview.hidden = true;
         drop.hidden = false;
     });

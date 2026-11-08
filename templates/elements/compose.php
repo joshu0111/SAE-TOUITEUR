@@ -17,6 +17,7 @@
 
             <div class="image-preview" id="imagePreview" hidden>
                 <img id="imagePreviewImg" alt="Aperçu de l'image">
+                <p class="image-status" id="imageStatus"></p>
                 <button type="button" id="imageRemove" class="image-remove">✕ Retirer l'image</button>
             </div>
         </div>

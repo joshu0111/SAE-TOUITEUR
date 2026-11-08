@@ -8,6 +8,10 @@
     --sans: Tahoma, Verdana, "Segoe UI", sans-serif;
 }
 
+[hidden] {
+    display: none !important;
+}
+
 * {
     box-sizing: border-box;
 }
@@ -754,4 +758,12 @@ a.btn {
     font-family: var(--mono);
     font-size: 12px;
     color: var(--violet);
+}
+
+.image-status {
+    margin: 6px 0;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--vert);
+    text-shadow: 0 0 6px var(--vert);
 }
