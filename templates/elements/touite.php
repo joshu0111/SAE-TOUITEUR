@@ -8,6 +8,13 @@
             <span class="date"><?= View::e($data['touite']['date']) ?></span>
         </div>
         <div class="texte"><?= View::e($data['touite']['contenu']) ?></div>
+        <?php if (!empty($data['touite']['image'])): ?>
+            <figure class="touite-image">
+                <img src="<?= View::e($data['touite']['image']) ?>"
+                     alt="<?= View::e($data['touite']['image_alt']) ?>"
+                     loading="lazy">
+            </figure>
+        <?php endif; ?>
         <div class="actions">
             <?php
                 $idTouite = (int) $data['touite']['id_touite'];
