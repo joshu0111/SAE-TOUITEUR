@@ -13,7 +13,7 @@
                 $idTouite = (int) $data['touite']['id_touite'];
                 $note     = (int) $data['touite']['note'];
                 $maNote   = $data['touite']['ma_note'] !== null ? (int) $data['touite']['ma_note'] : null;
-                $dejaVote = $maNote !== null;
+
             ?>
             <form class="vote" method="post" action="index.php?action=evaluer-un-touite">
                 <input type="hidden" name="id_touite" value="<?= $idTouite ?>">

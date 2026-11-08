@@ -36,7 +36,8 @@ class HomeAction extends Action {
 
         $page = min($page, $pages);
 
-        $user = $this->getUtilisateurConnecte();                                                   // NOUVEAU
+        $user = $this->getUtilisateurConnecte();
+        $idUser = $user['id'] ?? null;        // NOUVEAU
         $visible = $repo->getTouites(self::TOUITE_PAR_PAGE, ($page - 1) * self::TOUITE_PAR_PAGE, $user['id'] ?? null);  // MODIFIÉ
 
         // Recupere le nombre de page totale, la page actuelle(en verifiant que la page demande est possible a affihcher) et la longueur
@@ -46,8 +47,8 @@ class HomeAction extends Action {
 
         // Recupere tout les touites
         $touites = $tag === null
-            ? $repo->getTouites(self::TOUITE_PAR_PAGE, $offset)
-            : $repo->getTouitesParTag($tag, self::TOUITE_PAR_PAGE, $offset);
+            ? $repo->getTouites(self::TOUITE_PAR_PAGE, $offset, $idUser)
+            : $repo->getTouitesParTag($tag, self::TOUITE_PAR_PAGE, $offset, $idUser);
 
         return $this->page('Accueil', Template::Home, [
             'touites' => $touites,

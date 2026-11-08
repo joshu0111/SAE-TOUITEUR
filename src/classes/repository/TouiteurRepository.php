@@ -5,18 +5,12 @@ namespace touiteur\repository;
 use PDO;
 use Exception;
 use PDOException;
-<<<<<<< HEAD
 use touiteur\exceptions\{IncorrectPassword, AlreadyHaveAccount, PseudoAlreadyExists, PseudoNotFound, AuthException};
 use touiteur\touites\{Touite, Evaluation};
 
 
 class TouiteurRepository
 {
-=======
-use touiteur\touites\Touite;
-use touiteur\touites\Evaluation;
-class TouiteurRepository{
->>>>>>> feature/like-dislike-prolonge
     private PDO $pdo;
     private static ?TouiteurRepository $instance = null;
     private static array $config = [];
@@ -146,20 +140,16 @@ class TouiteurRepository{
             )->execute($params);
         }
     }
-<<<<<<< HEAD
 
 
     /**
      * Methode qui permet de compter les touites
      */
 
-=======
->>>>>>> feature/like-dislike-prolonge
     public function compterTouites(): int
     {
         return (int) $this->pdo->query("SELECT COUNT(*) FROM TOUITE")->fetchColumn();
     }
-<<<<<<< HEAD
 
     public function compterTouitesFiltreParTag(string $tag): int {
         $st = $this->pdo->prepare(
@@ -175,21 +165,29 @@ class TouiteurRepository{
     /**
      * Methode qui retourne les touites filtre par tag
      */
-    public function getTouitesParTag(string $tag, int $limit, int $offset) : array {
-
+    /**
+     * Touites filtrés par tag, mêmes colonnes que getTouites()
+     */
+    public function getTouitesParTag(string $tag, int $limit, int $offset, ?string $idUser = null): array
+    {
         $st = $this->pdo->prepare(
             "SELECT LOWER(CONCAT(u.prenom, ' ', u.nom)) AS auteur,
+                    t.id_touite,
                     u.id_utilisateur AS pseudo,
                     DATE_FORMAT(t.date_publication, '%d/%m/%Y %H:%i') AS date,
-                    t.contenu AS contenu
-            FROM TOUITE t
-            JOIN UTILISATEUR u ON u.id_utilisateur = t.id_utilisateur
-            INNER JOIN CONTENIR c ON t.id_touite = c.id_touite
-            INNER JOIN TAG ON c.id_tag = TAG.id_tag
-            WHERE TAG.libelle = :libelle
-            ORDER BY t.date_publication DESC, t.id_touite DESC;
-            LIMIT :limite OFFSET :decalage"
+                    t.contenu AS contenu,
+                    t.note AS note,
+                    e.valeur AS ma_note
+             FROM TOUITE t
+             JOIN UTILISATEUR u ON u.id_utilisateur = t.id_utilisateur
+             INNER JOIN CONTENIR c ON t.id_touite = c.id_touite
+             INNER JOIN TAG ON c.id_tag = TAG.id_tag
+             LEFT JOIN EVALUATION e ON e.id_touite = t.id_touite AND e.id_utilisateur = :moi
+             WHERE TAG.libelle = :libelle
+             ORDER BY t.date_publication DESC, t.id_touite DESC
+             LIMIT :limite OFFSET :decalage"
         );
+        $st->bindValue(':moi', $idUser);
         $st->bindValue(':libelle', $tag);
         $st->bindValue(':limite', $limit, PDO::PARAM_INT);
         $st->bindValue(':decalage', $offset, PDO::PARAM_INT);
@@ -376,6 +374,4 @@ class TouiteurRepository{
             ':mdp'    => $hash,
         ]);
     }
-=======
->>>>>>> feature/like-dislike-prolonge
 }
