@@ -32,7 +32,7 @@ class ProfilAction extends Action {
             'user' => [
                 'nom'            => $u['prenom'] . ' ' . $u['nom'],
                 'handle'         => $u['id_utilisateur'],
-                'bio'            => '',  
+                'bio'            => '',
                 'inscrit_le'     => '-',
                 'nb_touites'     => $nbTouites,
                 'nb_abonnes'     => $repo->compterAbonnes($pseudo),

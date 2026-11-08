@@ -20,11 +20,13 @@
                 <input type="hidden" name="page" value="<?= (int) $data['page'] ?>">
                 <button type="submit" name="vote" value="like"
                         class="<?= $maNote === 1 ? 'on' : '' ?>"
-                        <?= $dejaVote ? 'disabled' : '' ?> title="J'aime">▲ Like</button>
+                        title="J'aime">▲ Like</button>
+
                 <span class="note <?= $note > 0 ? 'pos' : ($note < 0 ? 'neg' : '') ?>" title="Note du touite"><?= $note > 0 ? '+' . $note : $note ?></span>
+
                 <button type="submit" name="vote" value="dislike"
                         class="<?= $maNote === -1 ? 'on neg' : '' ?>"
-                        <?= $dejaVote ? 'disabled' : '' ?> title="Je n'aime pas">▼ Dislike</button>
+                        title="Je n'aime pas">▼ Dislike</button>
             </form>
             <button type="button">Répondre</button>
             <button type="button">Retouiter</button>

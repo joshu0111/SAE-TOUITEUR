@@ -5,12 +5,18 @@ namespace touiteur\repository;
 use PDO;
 use Exception;
 use PDOException;
+<<<<<<< HEAD
 use touiteur\exceptions\{IncorrectPassword, AlreadyHaveAccount, PseudoAlreadyExists, PseudoNotFound, AuthException};
 use touiteur\touites\{Touite, Evaluation};
 
 
 class TouiteurRepository
 {
+=======
+use touiteur\touites\Touite;
+use touiteur\touites\Evaluation;
+class TouiteurRepository{
+>>>>>>> feature/like-dislike-prolonge
     private PDO $pdo;
     private static ?TouiteurRepository $instance = null;
     private static array $config = [];
@@ -110,36 +116,50 @@ class TouiteurRepository
      * @return bool true si l'evaluation est enregistree, false si l'utilisateur
      *              a deja evalue ce touite (ou si le touite n'existe pas)
      */
-    public function evaluerTouite(Evaluation $e): bool
+    /**
+     * Vote d'un utilisateur sur un touite :
+     * - pas encore voté     -> ajout
+     * - même vote re-cliqué -> retrait
+     * - vote opposé         -> changement d'avis
+     * La note est mise à jour par les triggers.
+     */
+    public function evaluerTouite(Evaluation $e): void
     {
-        try {
+        $params = [
+            ':user'   => $e->getIdUser(),
+            ':touite' => $e->getIdTouite(),
+            ':valeur' => $e->getValeur(),
+        ];
+
+        // Tente le retrait si le vote est identique, sinon ajoute ou change
+        $retire = $this->pdo->prepare(
+            "DELETE FROM EVALUATION
+             WHERE id_utilisateur = :user AND id_touite = :touite AND valeur = :valeur"
+        );
+        $retire->execute($params);
+
+        if ($retire->rowCount() === 0) {
             $this->pdo->prepare(
                 "INSERT INTO EVALUATION (id_utilisateur, id_touite, valeur)
-                 VALUES (:user, :touite, :valeur)"
-            )->execute([
-                ':user'   => $e->getIdUser(),
-                ':touite' => $e->getIdTouite(),
-                ':valeur' => $e->getValeur(),
-            ]);
-            return true;
-        } catch (PDOException $ex) {
-            // 23000 = violation de contrainte (cle primaire en double ou touite inexistant)
-            if ($ex->getCode() === '23000') {
-                return false;
-            }
-            throw $ex;
+                 VALUES (:user, :touite, :valeur)
+                 ON DUPLICATE KEY UPDATE valeur = VALUES(valeur), date_evaluation = NOW()"
+            )->execute($params);
         }
     }
+<<<<<<< HEAD
 
 
     /**
      * Methode qui permet de compter les touites
      */
 
+=======
+>>>>>>> feature/like-dislike-prolonge
     public function compterTouites(): int
     {
         return (int) $this->pdo->query("SELECT COUNT(*) FROM TOUITE")->fetchColumn();
     }
+<<<<<<< HEAD
 
     public function compterTouitesFiltreParTag(string $tag): int {
         $st = $this->pdo->prepare(
@@ -356,4 +376,6 @@ class TouiteurRepository
             ':mdp'    => $hash,
         ]);
     }
+=======
+>>>>>>> feature/like-dislike-prolonge
 }
