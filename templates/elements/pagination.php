@@ -1,4 +1,7 @@
-<?php use touiteur\render\View; ?>
+<?php
+use touiteur\render\View;
+$base = $data['base'] ?? 'index.php?action=home';
+?>
 <section class="win">
     <div class="pagination">
         <?php if ($data['page'] > 1): ?>

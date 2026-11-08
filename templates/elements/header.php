@@ -10,7 +10,7 @@
             <a href="index.php?action=home" class="on-link">Accueil</a>
             <a href="#">Explorer</a>
             <a href="#">Notifications</a>
-            <a href="#">Mon profil</a>
+            <a href="index.php?action=profil">Mon profil</a>
             <a href="#">Déconnexion</a>
         </nav>
         <input class="search" type="search" placeholder="Rechercher #tag ou @user">
