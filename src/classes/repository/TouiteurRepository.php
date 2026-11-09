@@ -110,24 +110,34 @@ class TouiteurRepository
      * @return bool true si l'evaluation est enregistree, false si l'utilisateur
      *              a deja evalue ce touite (ou si le touite n'existe pas)
      */
-    public function evaluerTouite(Evaluation $e): bool
+    /**
+     * Vote d'un utilisateur sur un touite :
+     * - pas encore voté     -> ajout
+     * - même vote re-cliqué -> retrait
+     * - vote opposé         -> changement d'avis
+     * La note est mise à jour par les triggers.
+     */
+    public function evaluerTouite(Evaluation $e): void
     {
-        try {
+        $params = [
+            ':user'   => $e->getIdUser(),
+            ':touite' => $e->getIdTouite(),
+            ':valeur' => $e->getValeur(),
+        ];
+
+        // Tente le retrait si le vote est identique, sinon ajoute ou change
+        $retire = $this->pdo->prepare(
+            "DELETE FROM EVALUATION
+             WHERE id_utilisateur = :user AND id_touite = :touite AND valeur = :valeur"
+        );
+        $retire->execute($params);
+
+        if ($retire->rowCount() === 0) {
             $this->pdo->prepare(
                 "INSERT INTO EVALUATION (id_utilisateur, id_touite, valeur)
-                 VALUES (:user, :touite, :valeur)"
-            )->execute([
-                ':user'   => $e->getIdUser(),
-                ':touite' => $e->getIdTouite(),
-                ':valeur' => $e->getValeur(),
-            ]);
-            return true;
-        } catch (PDOException $ex) {
-            // 23000 = violation de contrainte (cle primaire en double ou touite inexistant)
-            if ($ex->getCode() === '23000') {
-                return false;
-            }
-            throw $ex;
+                 VALUES (:user, :touite, :valeur)
+                 ON DUPLICATE KEY UPDATE valeur = VALUES(valeur), date_evaluation = NOW()"
+            )->execute($params);
         }
     }
 
@@ -172,21 +182,29 @@ class TouiteurRepository
     /**
      * Methode qui retourne les touites filtre par tag
      */
-    public function getTouitesParTag(string $tag, int $limit, int $offset) : array {
-
+    /**
+     * Touites filtrés par tag, mêmes colonnes que getTouites()
+     */
+    public function getTouitesParTag(string $tag, int $limit, int $offset, ?string $idUser = null): array
+    {
         $st = $this->pdo->prepare(
             "SELECT LOWER(CONCAT(u.prenom, ' ', u.nom)) AS auteur,
+                    t.id_touite,
                     u.id_utilisateur AS pseudo,
                     DATE_FORMAT(t.date_publication, '%d/%m/%Y %H:%i') AS date,
-                    t.contenu AS contenu
-            FROM TOUITE t
-            JOIN UTILISATEUR u ON u.id_utilisateur = t.id_utilisateur
-            INNER JOIN CONTENIR c ON t.id_touite = c.id_touite
-            INNER JOIN TAG ON c.id_tag = TAG.id_tag
-            WHERE TAG.libelle = :libelle
-            ORDER BY t.date_publication DESC, t.id_touite DESC;
-            LIMIT :limite OFFSET :decalage"
+                    t.contenu AS contenu,
+                    t.note AS note,
+                    e.valeur AS ma_note
+             FROM TOUITE t
+             JOIN UTILISATEUR u ON u.id_utilisateur = t.id_utilisateur
+             INNER JOIN CONTENIR c ON t.id_touite = c.id_touite
+             INNER JOIN TAG ON c.id_tag = TAG.id_tag
+             LEFT JOIN EVALUATION e ON e.id_touite = t.id_touite AND e.id_utilisateur = :moi
+             WHERE TAG.libelle = :libelle
+             ORDER BY t.date_publication DESC, t.id_touite DESC
+             LIMIT :limite OFFSET :decalage"
         );
+        $st->bindValue(':moi', $idUser);
         $st->bindValue(':libelle', $tag);
         $st->bindValue(':limite', $limit, PDO::PARAM_INT);
         $st->bindValue(':decalage', $offset, PDO::PARAM_INT);

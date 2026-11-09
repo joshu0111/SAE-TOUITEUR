@@ -13,18 +13,20 @@
                 $idTouite = (int) $data['touite']['id_touite'];
                 $note     = (int) $data['touite']['note'];
                 $maNote   = $data['touite']['ma_note'] !== null ? (int) $data['touite']['ma_note'] : null;
-                $dejaVote = $maNote !== null;
+
             ?>
             <form class="vote" method="post" action="index.php?action=evaluer-un-touite">
                 <input type="hidden" name="id_touite" value="<?= $idTouite ?>">
                 <input type="hidden" name="page" value="<?= (int) $data['page'] ?>">
                 <button type="submit" name="vote" value="like"
                         class="<?= $maNote === 1 ? 'on' : '' ?>"
-                        <?= $dejaVote ? 'disabled' : '' ?> title="J'aime">▲ Like</button>
+                        title="J'aime">▲ Like</button>
+
                 <span class="note <?= $note > 0 ? 'pos' : ($note < 0 ? 'neg' : '') ?>" title="Note du touite"><?= $note > 0 ? '+' . $note : $note ?></span>
+
                 <button type="submit" name="vote" value="dislike"
                         class="<?= $maNote === -1 ? 'on neg' : '' ?>"
-                        <?= $dejaVote ? 'disabled' : '' ?> title="Je n'aime pas">▼ Dislike</button>
+                        title="Je n'aime pas">▼ Dislike</button>
             </form>
             <button type="button">Répondre</button>
             <button type="button">Retouiter</button>
