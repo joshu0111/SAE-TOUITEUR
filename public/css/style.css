@@ -8,6 +8,10 @@
     --sans: Tahoma, Verdana, "Segoe UI", sans-serif;
 }
 
+[hidden] {
+    display: none !important;
+}
+
 * {
     box-sizing: border-box;
 }
@@ -695,3 +699,132 @@ a.btn {
     text-shadow: 0 0 6px var(--violet);
     box-shadow: 0 0 12px rgba(191, 0, 255, .35);
 }
+
+
+.file-drop { cursor: pointer; font-family: var(--mono); font-size: 12px; color: var(--vert); }
+.file-drop input { display: none; }
+.touite-image { margin: 8px 0 4px; }
+.touite-image img { display: block; max-width: 100%; max-height: 420px; border: 1px solid #333; }
+
+
+/* Zone de dépôt d'image */
+.image-zone { margin: 10px 0; }
+
+.image-drop {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px;
+    border: 2px dashed var(--vert);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background .15s, box-shadow .15s;
+}
+.image-drop:hover,
+.image-drop.dragover {
+    background: rgba(0, 255, 150, .06);
+    box-shadow: 0 0 14px rgba(0, 255, 150, .25);
+}
+.image-drop-icon {
+    font-family: var(--mono);
+    font-size: 28px;
+    color: var(--vert);
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--vert);
+    border-radius: 50%;
+}
+.image-drop-text {
+    font-family: var(--mono);
+    color: var(--vert);
+    font-size: 14px;
+    line-height: 1.5;
+}
+.image-drop-text small { color: #888; font-size: 11px; }
+
+.image-preview { position: relative; display: inline-block; }
+.image-preview[hidden] { display: none; }
+.image-preview img {
+    display: block;
+    max-width: 100%;
+    max-height: 260px;
+    border: 1px solid var(--violet);
+    border-radius: 4px;
+}
+.image-remove {
+    margin-top: 8px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--violet);
+}
+
+.image-status {
+    margin: 6px 0;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--vert);
+    text-shadow: 0 0 6px var(--vert);
+}
+
+/* Page explorer */
+.explorer {
+    grid-column: 1 / -1;   /* occupe toute la largeur de la grille, comme le header */
+    width: 100%;
+}
+
+.explorer-search input {
+    width: 100%;
+    background: var(--noir);
+    color: var(--vert);
+    font-family: var(--mono);
+    font-size: 14px;
+    border: 2px solid;
+    border-color: var(--noir) #6b6b6b #6b6b6b var(--noir);
+    padding: 8px 10px;
+}
+.explorer-search input:focus {
+    outline: 1px solid var(--violet);
+    box-shadow: 0 0 10px rgba(191, 0, 255, .5);
+}
+
+.user-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+    padding: 12px;
+}
+
+.user-card {
+    background: var(--noir);
+    border: 1px solid #333;
+    padding: 14px 10px;
+    text-align: center;
+}
+.user-card:hover { border-color: var(--vert); }
+
+.user-card .avatar {
+    width: 64px;
+    height: 64px;
+    font-size: 22px;
+    margin: 0 auto 8px;
+}
+.user-card .nom {
+    display: block;
+    color: var(--vert);
+    font-weight: bold;
+    text-decoration: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.user-card .handle {
+    display: block;
+    font-family: var(--mono);
+    color: var(--violet);
+    font-size: 12px;
+}
+.user-card .stats { margin-top: 8px; }
+.user-card form { margin-top: 10px; }
+.user-card form button { width: 100%; }

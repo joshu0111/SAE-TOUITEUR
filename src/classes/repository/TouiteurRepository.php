@@ -4,7 +4,6 @@ namespace touiteur\repository;
 
 use PDO;
 use Exception;
-use PDOException;
 use touiteur\exceptions\{IncorrectPassword, AlreadyHaveAccount, PseudoAlreadyExists, PseudoNotFound, AuthException};
 use touiteur\touites\{Touite, Evaluation};
 
@@ -49,19 +48,25 @@ class TouiteurRepository
         return $this->pdo;
     }
 
-    public function insererTouite(Touite $t, string $idUser): int
+    /**
+     * Methode qui permet d'inserer un touites avec son id d'image dans la bdd
+     */
+    public function insererTouite(Touite $t, string $idUser, ?int $idImage = null): int
     {
         $this->pdo->beginTransaction();
         try {
             $st = $this->pdo->prepare(
-                "INSERT INTO TOUITE (contenu, date_publication, id_utilisateur)
-                 VALUES (:contenu, NOW(), :user)"
+                "INSERT INTO TOUITE (contenu, date_publication, id_utilisateur, id_image)
+                 VALUES (:contenu, NOW(), :user, :image)"
             );
             $st->execute([
                 ':contenu' => $t->get_contenu(),
                 ':user'    => $idUser,
+                ':image'   => $idImage,
             ]);
             $id = (int) $this->pdo->lastInsertId();
+
+            $this->associerTags($id, $t->getTags());
 
             $this->pdo->prepare(
                 "UPDATE UTILISATEUR SET nb_touites = nb_touites + 1
@@ -73,6 +78,35 @@ class TouiteurRepository
         } catch (Exception $e) {
             $this->pdo->rollBack();
             throw $e;
+        }
+    }
+
+    /**
+     * Methode qui permet d'associer les tags fournis en prarametres a un touites
+    */
+    private function associerTags(int $idTouite, array $tags): void
+    {
+        if (empty($tags)) {
+            return;
+        }
+
+        // Cree le tag s'il n'existe pas, sinon recupere son id
+        $creerTag = $this->pdo->prepare(
+            "INSERT INTO TAG (libelle) VALUES (:libelle)
+             ON DUPLICATE KEY UPDATE id_tag = LAST_INSERT_ID(id_tag)"
+        );
+
+        // On lie les tags au touite
+        $lier = $this->pdo->prepare(
+            "INSERT INTO CONTENIR (id_touite, id_tag) VALUES (:touite, :tag)"
+        );
+
+        // On recupere/ajoute le tag et le lie a son touite sur tout les tags fournis en parametres
+        foreach ($tags as $libelle) {
+            $creerTag->execute([':libelle' => $libelle]);
+            $idTag = (int) $this->pdo->lastInsertId();
+
+            $lier->execute([':touite' => $idTouite, ':tag' => $idTag]);
         }
     }
 
@@ -90,9 +124,11 @@ class TouiteurRepository
                     DATE_FORMAT(t.date_publication, '%d/%m/%Y %H:%i') AS date,
                     t.contenu AS contenu,
                     t.note AS note,
-                    e.valeur AS ma_note
+                    e.valeur AS ma_note, i.chemin_fichier AS image,
+                    i.description AS image_alt
              FROM TOUITE t
              JOIN UTILISATEUR u ON u.id_utilisateur = t.id_utilisateur
+             LEFT JOIN IMAGE i ON i.id_image = t.id_image
              LEFT JOIN EVALUATION e ON e.id_touite = t.id_touite AND e.id_utilisateur = :user
              ORDER BY t.date_publication DESC, t.id_touite DESC
              LIMIT :limite OFFSET :decalage"
@@ -182,9 +218,6 @@ class TouiteurRepository
     /**
      * Methode qui retourne les touites filtre par tag
      */
-    /**
-     * Touites filtrés par tag, mêmes colonnes que getTouites()
-     */
     public function getTouitesParTag(string $tag, int $limit, int $offset, ?string $idUser = null): array
     {
         $st = $this->pdo->prepare(
@@ -194,9 +227,12 @@ class TouiteurRepository
                     DATE_FORMAT(t.date_publication, '%d/%m/%Y %H:%i') AS date,
                     t.contenu AS contenu,
                     t.note AS note,
-                    e.valeur AS ma_note
+                    e.valeur AS ma_note,
+                    i.chemin_fichier AS image,
+                    i.description    AS image_alt
              FROM TOUITE t
              JOIN UTILISATEUR u ON u.id_utilisateur = t.id_utilisateur
+             LEFT JOIN IMAGE i ON i.id_image = t.id_image
              INNER JOIN CONTENIR c ON t.id_touite = c.id_touite
              INNER JOIN TAG ON c.id_tag = TAG.id_tag
              LEFT JOIN EVALUATION e ON e.id_touite = t.id_touite AND e.id_utilisateur = :moi
@@ -273,6 +309,48 @@ class TouiteurRepository
         return $st->fetchColumn() !== false;
     }
 
+    /** Methode qui permet d'ajoute une persone qui suit  */
+    public function suivreUtilisateur(string $suiveur, string $suivi): void
+    {
+        $this->pdo->prepare(
+            "INSERT INTO SUIVRE (id_suiveur, id_suivi) VALUES (:suiveur, :suivi)
+             ON DUPLICATE KEY UPDATE id_suivi = id_suivi"
+        )->execute([':suiveur' => $suiveur, ':suivi' => $suivi]);
+    }
+    /**
+     * Methode qui permet d'enlever une personne qui suit une autre
+     */
+    public function desabonner(string $suiveur, string $suivi): void
+    {
+        $this->pdo->prepare(
+            "DELETE FROM SUIVRE WHERE id_suiveur = :suiveur AND id_suivi = :suivi"
+        )->execute([':suiveur' => $suiveur, ':suivi' => $suivi]);
+    }
+
+
+    public function getUtilisateurs(string $recherche, ?string $idUser): array{
+        // Échappe les caractères joker de LIKE pour qu'ils soient traites comme du texte
+        $motif = '%' . addcslashes($recherche, '%_\\') . '%';
+
+        $st = $this->pdo->prepare(
+            "SELECT u.id_utilisateur AS pseudo,
+                    CONCAT(u.prenom, ' ', u.nom) AS nom,
+                    (SELECT COUNT(*) FROM TOUITE t WHERE t.id_utilisateur = u.id_utilisateur) AS nb_touites,
+                    (SELECT COUNT(*) FROM SUIVRE s WHERE s.id_suivi = u.id_utilisateur) AS nb_abonnes,
+                    (SELECT COUNT(*) FROM SUIVRE s WHERE s.id_suiveur = u.id_utilisateur)     AS nb_abonnements,
+                    EXISTS(SELECT 1 FROM SUIVRE s
+                           WHERE s.id_suiveur = :moi AND s.id_suivi = u.id_utilisateur)       AS suivi
+             FROM UTILISATEUR u
+             WHERE u.id_utilisateur LIKE :q1 OR CONCAT(u.prenom, ' ', u.nom) LIKE :q2
+             ORDER BY u.id_utilisateur"
+        );
+        $st->bindValue(':moi', $idUser);
+        $st->bindValue(':q1', $motif);
+        $st->bindValue(':q2', $motif);
+        $st->execute();
+        return $st->fetchAll();
+    }
+
     /**
      * Utilisateurs suivis par $pseudo, au format de la sidebar (nom, pseudo)
      */
@@ -320,9 +398,12 @@ class TouiteurRepository
                     DATE_FORMAT(t.date_publication, '%d/%m/%Y %H:%i') AS date,
                     t.contenu AS contenu,
                     t.note AS note,
-                    e.valeur AS ma_note
+                    e.valeur AS ma_note,
+                    i.chemin_fichier AS image,
+                    i.description    AS image_alt
              FROM TOUITE t
              JOIN UTILISATEUR u ON u.id_utilisateur = t.id_utilisateur
+             LEFT JOIN IMAGE i ON i.id_image = t.id_image
              LEFT JOIN EVALUATION e ON e.id_touite = t.id_touite AND e.id_utilisateur = :moi
              WHERE t.id_utilisateur = :pseudo
              ORDER BY t.date_publication DESC, t.id_touite DESC
@@ -390,5 +471,17 @@ class TouiteurRepository
             ':email'  => $email,
             ':mdp'    => $hash,
         ]);
+    }
+
+    /**
+     * Methode qui permet d'inserer une image dans le base de donnee
+     */
+    public function insererImage(string $description, string $chemin): int
+    {
+        $this->pdo->prepare(
+            "INSERT INTO IMAGE (description, chemin_fichier) VALUES (:description, :chemin)"
+        )->execute([':description' => $description, ':chemin' => $chemin]);
+
+        return (int) $this->pdo->lastInsertId();
     }
 }

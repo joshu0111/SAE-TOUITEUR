@@ -12,7 +12,7 @@ use touiteur\render\Template;
  *   follows : (optionnel) abonnements de cet utilisateur
  *   (voir ProfilAction pour la construction de ces données)
  */
-$u        = $data['user'];
+$u = $data['user'];
 $initiales = mb_strtoupper(mb_substr($u['nom'], 0, 2));
 ?>
 <aside>
@@ -70,11 +70,7 @@ $initiales = mb_strtoupper(mb_substr($u['nom'], 0, 2));
                 </div>
             <?php endif; ?>
             <?php foreach ($data['touites'] as $touite): ?>
-<<<<<<< HEAD
                 <?= View::render(Template::Touite, ['touite' => $touite, 'page' => $data['page']]) ?>
-=======
-                <?= View::render(Template::Touite, ['touite' => $touite]) ?>
->>>>>>> feature/like-dislike-prolonge
             <?php endforeach; ?>
         </div>
     </section>

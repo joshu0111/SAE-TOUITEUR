@@ -13,8 +13,7 @@ $utilisateur = $_SESSION['user'] ?? null;
         <a class="logo" href="index.php">TOUITEUR<small>.net</small></a>
         <nav class="nav">
             <a href="index.php?action=home" class="on-link">Accueil</a>
-            <a href="#">Explorer</a>
-            <a href="#">Notifications</a>
+            <a href="index.php?action=explorer">Explorer</a>
             <?php if ($utilisateur !== null): ?>
                 <a href="index.php?action=profil">Mon profil</a>
                 <a href="index.php?action=deconnexion">Déconnexion</a>
