@@ -28,5 +28,7 @@ $dispatch->addRoute('profil', touiteur\action\ProfilAction::class);
 $dispatch->addRoute('connexion', touiteur\action\ConnexionAction::class);
 $dispatch->addRoute('deconnexion', touiteur\action\DeconnexionAction::class);
 $dispatch->addRoute('inscription', touiteur\action\InscriptionAction::class);
+$dispatch->addRoute('explorer', touiteur\action\ExplorerAction::class);
+$dispatch->addRoute('suivre', touiteur\action\SuivreAction::class);
 
 echo $dispatch->run();

@@ -292,6 +292,48 @@ class TouiteurRepository
         return $st->fetchColumn() !== false;
     }
 
+    /** Methode qui permet d'ajoute une persone qui suit  */
+    public function suivreUtilisateur(string $suiveur, string $suivi): void
+    {
+        $this->pdo->prepare(
+            "INSERT INTO SUIVRE (id_suiveur, id_suivi) VALUES (:suiveur, :suivi)
+             ON DUPLICATE KEY UPDATE id_suivi = id_suivi"
+        )->execute([':suiveur' => $suiveur, ':suivi' => $suivi]);
+    }
+    /**
+     * Methode qui permet d'enlever une personne qui suit une autre
+     */
+    public function desabonner(string $suiveur, string $suivi): void
+    {
+        $this->pdo->prepare(
+            "DELETE FROM SUIVRE WHERE id_suiveur = :suiveur AND id_suivi = :suivi"
+        )->execute([':suiveur' => $suiveur, ':suivi' => $suivi]);
+    }
+
+
+    public function getUtilisateurs(string $recherche, ?string $idUser): array{
+        // Échappe les caractères joker de LIKE pour qu'ils soient traites comme du texte
+        $motif = '%' . addcslashes($recherche, '%_\\') . '%';
+
+        $st = $this->pdo->prepare(
+            "SELECT u.id_utilisateur AS pseudo,
+                    CONCAT(u.prenom, ' ', u.nom) AS nom,
+                    (SELECT COUNT(*) FROM TOUITE t WHERE t.id_utilisateur = u.id_utilisateur) AS nb_touites,
+                    (SELECT COUNT(*) FROM SUIVRE s WHERE s.id_suivi = u.id_utilisateur) AS nb_abonnes,
+                    (SELECT COUNT(*) FROM SUIVRE s WHERE s.id_suiveur = u.id_utilisateur)     AS nb_abonnements,
+                    EXISTS(SELECT 1 FROM SUIVRE s
+                           WHERE s.id_suiveur = :moi AND s.id_suivi = u.id_utilisateur)       AS suivi
+             FROM UTILISATEUR u
+             WHERE u.id_utilisateur LIKE :q1 OR CONCAT(u.prenom, ' ', u.nom) LIKE :q2
+             ORDER BY u.id_utilisateur"
+        );
+        $st->bindValue(':moi', $idUser);
+        $st->bindValue(':q1', $motif);
+        $st->bindValue(':q2', $motif);
+        $st->execute();
+        return $st->fetchAll();
+    }
+
     /**
      * Utilisateurs suivis par $pseudo, au format de la sidebar (nom, pseudo)
      */

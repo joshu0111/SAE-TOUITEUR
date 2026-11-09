@@ -21,7 +21,11 @@ class EvaluerTouite extends Action {
             TouiteurRepository::getInstance()->evaluerTouite($evaluation);
         }
 
-        header('Location: index.php?action=home&page=' . $page . '#touite-' . (int) $idTouite);
+        $retour = $_POST['retour'] ?? '';
+        if (!preg_match('#^index\.php\?#', $retour)) {
+            $retour = 'index.php?action=home';
+        }
+        header('Location: ' . $retour . '#touite-' . (int) $idTouite);
         exit;
     }
 }
