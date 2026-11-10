@@ -8,7 +8,7 @@ use touiteur\repository\TouiteurRepository;
 class ExplorerAction extends Action {
     public function execute(): string {
         $moi       = $this->getUtilisateurConnecte()['id'] ?? null;
-        $recherche = trim((string) ($_GET['q'] ?? $moi));
+        $recherche = trim((string) ($_GET['q'] ?? ''));
 
         $utilisateurs = TouiteurRepository::getInstance()->getUtilisateurs($recherche, $moi);
 
