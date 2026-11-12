@@ -33,5 +33,6 @@ $dispatch->addRoute('deconnexion', touiteur\action\DeconnexionAction::class);
 $dispatch->addRoute('inscription', touiteur\action\InscriptionAction::class);
 $dispatch->addRoute('explorer', touiteur\action\ExplorerAction::class);
 $dispatch->addRoute('suivre', touiteur\action\SuivreAction::class);
+$dispatch->addRoute('influenceurs', touiteur\action\InfluenceursAction::class);
 
 echo $dispatch->run();
