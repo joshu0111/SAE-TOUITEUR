@@ -829,6 +829,110 @@ a.btn {
 .user-card form { margin-top: 10px; }
 .user-card form button { width: 100%; }
 
-.admin-table { width: 100%; border-collapse: collapse; }
-.admin-table th, .admin-table td { padding: 6px 10px; text-align: left; border-bottom: 1px solid #ccc; }
-.admin-table .num { text-align: right; }
+.admin-summary {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 28px;
+    background: var(--noir);
+    border-bottom: 1px solid #333;
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--texte);
+}
+
+.admin-summary b {
+    color: var(--vert);
+    font-size: 16px;
+    text-shadow: 0 0 8px rgba(44, 255, 5, .6);
+}
+
+.admin-summary .tri {
+    margin-left: auto;
+    color: var(--violet);
+}
+
+/* Message "aucun résultat" sur toute la largeur de la grille */
+.user-grid .empty {
+    grid-column: 1 / -1;
+}
+
+
+.rank-card {
+    position: relative;
+    transition: border-color .15s, box-shadow .15s, transform .15s;
+}
+
+.rank-card:hover {
+    border-color: var(--vert);
+    box-shadow: 0 0 14px rgba(44, 255, 5, .45);
+    transform: translateY(-2px);
+}
+
+
+.rank-card.top {
+    border-color: var(--violet);
+    box-shadow: 0 0 16px rgba(191, 0, 255, .55), inset 0 0 14px rgba(191, 0, 255, .12);
+}
+
+.rank-card.top:hover {
+    border-color: var(--violet);
+    box-shadow: 0 0 24px rgba(191, 0, 255, .85), inset 0 0 14px rgba(191, 0, 255, .2);
+}
+
+.rank-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    padding: 1px 6px;
+    background: var(--violet);
+    color: var(--noir);
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: bold;
+    box-shadow: 0 0 8px var(--violet);
+}
+
+
+.rank-count {
+    margin-top: 10px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #9a9a9a;
+}
+
+.rank-count b {
+    display: block;
+    font-size: 30px;
+    line-height: 1.1;
+    letter-spacing: 0;
+    color: var(--vert);
+    text-shadow: 0 0 12px var(--vert);
+}
+
+.rank-card.top .rank-count b {
+    color: #E040FF;
+    text-shadow: 0 0 12px var(--violet);
+}
+
+
+.rank-bar {
+    height: 6px;
+    margin-top: 10px;
+    background: #1a1a1a;
+    border: 1px solid #333;
+}
+
+.rank-bar span {
+    display: block;
+    height: 100%;
+    background: var(--vert);
+    box-shadow: 0 0 8px var(--vert);
+}
+
+.rank-card.top .rank-bar span {
+    background: var(--violet);
+    box-shadow: 0 0 8px var(--violet);
+}
