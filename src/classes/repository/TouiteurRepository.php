@@ -95,6 +95,20 @@ class TouiteurRepository
              ORDER BY nb_abonnes DESC, u.id_utilisateur ASC"
         )->fetchAll();
     }
+    
+    /**
+     * Tags utilises dans au moins un touite, avec leur nombre de mentions, par ordre croissant
+     */
+    public function getTendances(): array
+    {
+        return $this->pdo->query(
+            "SELECT tg.libelle, COUNT(c.id_touite) AS nb
+             FROM TAG tg
+             JOIN CONTENIR c ON c.id_tag = tg.id_tag
+             GROUP BY tg.id_tag, tg.libelle
+             ORDER BY nb ASC, tg.libelle ASC"
+        )->fetchAll();
+    }
 
     /**
      * Methode qui permet d'associer les tags fournis en prarametres a un touites
