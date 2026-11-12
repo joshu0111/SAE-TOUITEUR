@@ -80,6 +80,21 @@ class TouiteurRepository
             throw $e;
         }
     }
+    /**
+     * Utilisateurs qui ont au moins un abonne, tries par nombre d'abonnes croissant
+     */
+    public function getInfluenceurs(): array
+    {
+        return $this->pdo->query(
+            "SELECT u.id_utilisateur AS pseudo,
+                    CONCAT(u.prenom, ' ', u.nom) AS nom,
+                    COUNT(s.id_suiveur) AS nb_abonnes
+             FROM UTILISATEUR u
+             JOIN SUIVRE s ON s.id_suivi = u.id_utilisateur
+             GROUP BY u.id_utilisateur, u.prenom, u.nom
+             ORDER BY nb_abonnes DESC, u.id_utilisateur ASC"
+        )->fetchAll();
+    }
 
     /**
      * Methode qui permet d'associer les tags fournis en prarametres a un touites

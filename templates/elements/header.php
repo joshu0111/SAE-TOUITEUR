@@ -1,7 +1,6 @@
 <?php
 use touiteur\render\View;
 
-// Utilisateur connecté (null si personne n'est connecté)
 $utilisateur = $_SESSION['user'] ?? null;
 ?>
 <header class="win">
@@ -14,7 +13,11 @@ $utilisateur = $_SESSION['user'] ?? null;
         <nav class="nav">
             <a href="index.php?action=home" class="on-link">Accueil</a>
             <a href="index.php?action=explorer">Explorer</a>
+            
             <?php if ($utilisateur !== null): ?>
+                <?php if (($utilisateur['role'] ?? 'user') === 'admin'): ?>
+                    <a href="index.php?action=influenceurs">Influenceurs</a>
+                <?php endif; ?>
                 <a href="index.php?action=profil">Mon profil</a>
                 <a href="index.php?action=deconnexion">Déconnexion</a>
             <?php else: ?>
