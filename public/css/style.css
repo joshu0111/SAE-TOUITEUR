@@ -828,3 +828,7 @@ a.btn {
 .user-card .stats { margin-top: 8px; }
 .user-card form { margin-top: 10px; }
 .user-card form button { width: 100%; }
+
+.admin-table { width: 100%; border-collapse: collapse; }
+.admin-table th, .admin-table td { padding: 6px 10px; text-align: left; border-bottom: 1px solid #ccc; }
+.admin-table .num { text-align: right; }

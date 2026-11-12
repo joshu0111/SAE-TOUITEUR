@@ -15,6 +15,7 @@ enum Template : string {
     case Inscription = 'pages/inscription';
     
     case Explorer = 'pages/explorer';
+    case Influenceurs = 'pages/influenceurs';
 
     case Header = 'elements/header';
     case Touite = 'elements/touite';
