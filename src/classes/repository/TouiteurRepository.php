@@ -420,9 +420,9 @@ class TouiteurRepository
 
     public function connexionUser(string $pseudo, string $pass) : array {
         $st = $this->pdo->prepare(
-                "SELECT id_utilisateur, prenom, nom, mdp
-                 FROM UTILISATEUR
-                 WHERE id_utilisateur = :user"
+                "SELECT id_utilisateur, prenom, nom, mdp, role
+                FROM UTILISATEUR
+                WHERE id_utilisateur = :user"
             );
             $st->execute([':user' => $pseudo]);
             $user = $st->fetch();

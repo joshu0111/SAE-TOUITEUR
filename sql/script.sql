@@ -17,7 +17,9 @@ CREATE TABLE UTILISATEUR (
     prenom          VARCHAR(50)  NOT NULL,
     mdp             VARCHAR(255) NOT NULL,
     email           VARCHAR(100) NOT NULL UNIQUE,
-    nb_touites      INT          NOT NULL DEFAULT 0
+    role            VARCHAR(10)  NOT NULL DEFAULT 'user',
+    nb_touites      INT          NOT NULL DEFAULT 0,
+    CONSTRAINT chk_utilisateur_role CHECK (role IN ('user', 'admin'))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE TAG (

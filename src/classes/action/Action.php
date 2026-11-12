@@ -34,4 +34,21 @@ abstract class Action {
     protected function getUtilisateurConnecte(): ?array {
         return $_SESSION['user'] ?? null;
     }
+
+    /**
+     * true si l'utilisateur connecte est administrateur
+     */
+    protected function estAdmin(): bool {
+        return ($_SESSION['user']['role'] ?? 'user') === 'admin';
+    }
+
+    /**
+     * Redirige vers l'accueil si l'utilisateur n'est pas administrateur
+     */
+    protected function exigerAdmin(): void {
+        if (!$this->estAdmin()) {
+            header('Location: index.php');
+            exit();
+        }
+    }
 }

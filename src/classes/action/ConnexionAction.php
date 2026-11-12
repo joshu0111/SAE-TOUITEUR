@@ -31,7 +31,8 @@ class ConnexionAction extends Action{
                     $user = $bdd->connexionUser($_POST['pseudo'], $_POST['password']);
                     $_SESSION['user'] = [
                         'id'      => $_POST['pseudo'],
-                        'name'    => $user['prenom'] . " " . $user['nom']
+                        'name'    => $user['prenom'] . " " . $user['nom'],
+                        'role'    => $user['role']
                     ];
                     header("Location: index.php");
                     exit();
