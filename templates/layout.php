@@ -16,9 +16,7 @@ use touiteur\render\Template;
     <div class="layout">
         <?= $data['content'] ?>
     </div>
-    <footer>
-        <b>Touiteur v2.0</b> &middot; Meilleur affichage : 1024x768
-    </footer>
+
 </div>
 <script src="public/js/app.js"></script>
 </body>

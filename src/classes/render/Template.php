@@ -23,4 +23,6 @@ enum Template : string {
     case Pagination = 'elements/pagination';
     case SidebarFollows = 'elements/sidebar_follows';
     case SidebarTags = 'elements/sidebar_tags';
+    case TagPanel = 'elements/tag_panel';
+    case TagResults = 'elements/tag_results';
 }

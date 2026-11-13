@@ -71,11 +71,44 @@
     });
 
     remove.addEventListener('click', function () {
-        input.value = '';
-        URL.revokeObjectURL(previewImg.src);
-        previewImg.removeAttribute('src');
-        if (status) status.textContent = '';
-        preview.hidden = true;
-        drop.hidden = false;
+      input.value = '';
+      // Liberation de la ram sinon est garder en memoire
+      URL.revokeObjectURL(previewImg.src);
+      previewImg.removeAttribute('src');
+      if (status) status.textContent = '';
+      preview.hidden = true;
+      drop.hidden = false;
     });
+})();
+
+/* ---------- Recherche de tags en direct (la liste se met a jour sans recharger la page) ---------- */
+(function () {
+    const search = document.getElementById('tagSearch');
+    const results = document.getElementById('tagResults');
+    // Arrete l'execution si les elements  n'existent pas sur la page
+    if (!search || !results) return;
+
+    let minuteur = null;
+    let derniere = 0;
+
+  // Attente de 250 ms avant de lancer la nouvelle recherche
+  search.addEventListener('input', function () {
+      // Stop du timer
+      clearTimeout(minuteur);
+      minuteur = setTimeout(chercher, 250);
+    });
+
+    function chercher() {
+        const q = search.value.trim();
+        const tag = new URLSearchParams(window.location.search).get('tag') || '';
+        const numero = ++derniere;
+        // Convertit la reponse du serveur en texte
+        fetch('index.php?action=rechercher-tags&q=' + encodeURIComponent(q) +
+              '&tag=' + encodeURIComponent(tag), { credentials: 'same-origin' })
+            .then(function (r) { return r.text(); })
+            .then(function (html) {
+                // Nouvelle lettre pendant que le serveur repondait, ancienne requête ignoree
+                if (numero === derniere) results.innerHTML = html;
+            });
+    }
 })();

@@ -14,46 +14,48 @@ class HomeAction extends Action {
     }
 
     /**
-        * Affiche la page d'accueil, filtree par tag si $tag n'est pas null.
-        * La meme logique de pagination s'applique dans les deux cas.
-        */
+     * Affiche l'accueil
+     * Sans filtre, c'est le mur de l'utilisateur (comptes suivis + tags suivis)
+     * Avec un tag, ce sont les touites de ce tag (sans avoir besoin de le suivre)
+     */
     private function afficher(?string $tag): string {
         $repo = TouiteurRepository::getInstance();
+        $user = $this->getUtilisateurConnecte();
+        $idUser = $user['id'] ?? null;
 
-        // Recuperation de la page a afficher en filtrant l'entree
-
+        // Pagination : page demandee, bornee au nombre de pages disponibles
         $page = filter_var($_GET['page'] ?? 1, FILTER_VALIDATE_INT, [
             'options' => ['min_range' => 1, 'default' => 1],
         ]);
 
-        // Recupere le nombre de touites
-        $total = $tag === null
-            ? $repo->compterTouites()
-            : $repo->compterTouitesFiltreParTag($tag);
+        if ($tag !== null) {
+            $total = $repo->compterTouitesFiltreParTag($tag);
+        } else {
+            $total = $idUser === null ? 0 : $repo->compterMur($idUser);
+        }
 
-
-        $pages = max(1, (int) ceil($total / self::TOUITE_PAR_PAGE));
-
-        $page = min($page, $pages);
-
-        $user = $this->getUtilisateurConnecte();
-        $idUser = $user['id'] ?? null;        // NOUVEAU
-        $visible = $repo->getTouites(self::TOUITE_PAR_PAGE, ($page - 1) * self::TOUITE_PAR_PAGE, $user['id'] ?? null);  // MODIFIÉ
-
-        // Recupere le nombre de page totale, la page actuelle(en verifiant que la page demande est possible a affihcher) et la longueur
+        // Nombre de pages max
         $pages  = max(1, (int) ceil($total / self::TOUITE_PAR_PAGE));
+
+        // Verifie que la page demande depasse le nombre de celle qui existe
         $page   = min($page, $pages);
+
         $offset = ($page - 1) * self::TOUITE_PAR_PAGE;
 
-        // Recupere tout les touites
-        $touites = $tag === null
-            ? $repo->getTouites(self::TOUITE_PAR_PAGE, $offset, $idUser)
-            : $repo->getTouitesParTag($tag, self::TOUITE_PAR_PAGE, $offset, $idUser);
+        if ($tag !== null) {
+            $touites = $repo->getTouitesParTag($tag, self::TOUITE_PAR_PAGE, $offset, $idUser);
+        } else {
+            $touites = $idUser === null ? [] : $repo->getMur(self::TOUITE_PAR_PAGE, $offset, $idUser);
+        }
+
+        $tq = ltrim(trim((string) ($_GET['tq'] ?? '')), '#');
 
         return $this->page('Accueil', Template::Home, [
             'touites' => $touites,
-            'follows' => $repo->getFollows(),
-            'tags'    => $repo->getTags(),
+            'follows' => $user !== null ? $repo->getAbonnements($user['id']) : [],
+            'tags'    => $user === null ? [] : ($tq === '' ? $repo->getTagsSuivis($user['id']) : $repo->rechercherTags($tq, $user['id'])),
+            'tq'      => $tq,
+            'retour'  => $this->urlAccueil($tag, $tq),
             'page'    => $page,
             'pages'   => $pages,
             'tag'     => $tag,

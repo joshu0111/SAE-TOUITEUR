@@ -1,7 +1,7 @@
 CREATE DATABASE IF NOT EXISTS touiteur CHARACTER SET utf8mb4;
 USE touiteur;
 
--- Ordre inverse des dependances, pour pouvoir relancer le script
+
 DROP TABLE IF EXISTS EVALUATION;
 DROP TABLE IF EXISTS ABONNEMENT;
 DROP TABLE IF EXISTS SUIVRE;
@@ -80,8 +80,7 @@ CREATE TABLE ABONNEMENT (
         REFERENCES TAG (id_tag) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Evaluation d'un touite : +1 (like) ou -1 (dislike), une seule fois
--- par utilisateur et par touite (garanti par la cle primaire).
+
 CREATE TABLE EVALUATION (
     id_utilisateur   VARCHAR(50) NOT NULL,
     id_touite        INT         NOT NULL,
@@ -95,7 +94,7 @@ CREATE TABLE EVALUATION (
         REFERENCES TOUITE (id_touite) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Triggers : maintiennent TOUITE.note a jour
+
 DELIMITER //
 
 CREATE TRIGGER trg_evaluation_insert
@@ -114,8 +113,20 @@ BEGIN
     WHERE id_touite = OLD.id_touite;
 END//
 
+
+CREATE TRIGGER trg_evaluation_update
+AFTER UPDATE ON EVALUATION
+FOR EACH ROW
+BEGIN
+    UPDATE TOUITE SET note = note - OLD.valeur + NEW.valeur
+    WHERE id_touite = NEW.id_touite;
+END//
+
 DELIMITER ;
 
--- Jeu d'essai minimal (utilisateur utilise par index.php)
-INSERT INTO UTILISATEUR (id_utilisateur, nom, prenom, mdp, email)
-VALUES ('josh_r', 'R', 'Josh', 'changeme', 'josh@example.com');
+
+ALTER TABLE UTILISATEUR
+    ADD COLUMN role VARCHAR(10) NOT NULL DEFAULT 'user' AFTER email;
+
+ALTER TABLE UTILISATEUR
+    ADD CONSTRAINT chk_utilisateur_role CHECK (role IN ('user', 'admin'));

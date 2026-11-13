@@ -28,15 +28,50 @@ abstract class Action {
 
     /**
      * Methode qui permet d'executer le code en focntion de l'action
-     * @return string : correspond au texte
      */
     abstract public function execute() : string;
+
+    /**
+     * Ancre HTML  pour revenir au bon endroit de la page apres une action
+     */
+    protected function ancre(string $brut): string {
+        // Supprime tout ce qui n'est pas une lettre (\p{L}), un chiffre (\p{N}), un underscore, un point ou un tiret
+        // Le modificateur /u est utilise pour bien traiter le format Unicode
+        $propre = preg_replace('/[^\p{L}\p{N}_.-]/u', '', $brut);
+        return $propre !== '' ? '#' . $propre : '';
+    }
+
+    /**
+     * Adresse de retour
+     */
+    protected function retourValide(string $brut): string {
+        // Teste si la chaine commence bine par index\.php sinon redirige
+        return preg_match('#^index\.php\?#', $brut) ? $brut : 'index.php?action=home';
+    }
+
+    /**
+     * Adresse de l'accueil avec le filtre par tag et la recherche de tags en cours
+     */
+    protected function urlAccueil(?string $tag, string $tq): string {
+        $url = 'index.php?action=home';
+        if ($tag !== null && $tag !== '') {
+            $url .= '&tag=' . urlencode($tag);
+        }
+        if ($tq !== '') {
+            $url .= '&tq=' . urlencode($tq);
+        }
+        return $url;
+    }
+
+    /**
+     * Verifie si un user est connecte
+     */
     protected function getUtilisateurConnecte(): ?array {
         return $_SESSION['user'] ?? null;
     }
 
     /**
-     * true si l'utilisateur connecte est administrateur
+     * True si l'utilisateur connecte est administrateur
      */
     protected function estAdmin(): bool {
         return ($_SESSION['user']['role'] ?? 'user') === 'admin';

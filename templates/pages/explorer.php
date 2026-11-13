@@ -16,7 +16,7 @@ use touiteur\render\View;
         <?php endif; ?>
 
         <?php foreach ($data['utilisateurs'] as $u): ?>
-            <article class="user-card">
+            <article class="user-card" id="user-<?= View::e($u['pseudo']) ?>">
                 <div class="avatar"><?= View::e(strtoupper(substr($u['nom'], 0, 2))) ?></div>
 
                 <a class="nom" href="index.php?action=profil&amp;user=<?= urlencode($u['pseudo']) ?>">
@@ -33,6 +33,7 @@ use touiteur\render\View;
                 <?php if ($u['pseudo'] !== $data['moi']): ?>
                     <form method="post" action="index.php?action=suivre">
                         <input type="hidden" name="id_suivi" value="<?= View::e($u['pseudo']) ?>">
+                        <input type="hidden" name="ancre" value="<?= View::e('user-' . $u['pseudo']) ?>">
                         <input type="hidden" name="retour" value="<?= View::e('index.php?' . ($_SERVER['QUERY_STRING'] ?? '')) ?>">
                         <button type="submit" class="<?= $u['suivi'] ? 'on' : '' ?>">
                             <?= $u['suivi'] ? 'Abonné ✓' : 'S\'abonner' ?>

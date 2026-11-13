@@ -2,7 +2,7 @@
 use touiteur\render\View;
 use touiteur\render\Template;
 
-// Utilisateur connecté (null si personne n'est connecté)
+// Utilisateur connecte (null si personne n'est connecté)
 $moi = $_SESSION['user'] ?? null;
 ?>
 <aside>
@@ -19,7 +19,9 @@ $moi = $_SESSION['user'] ?? null;
             <?php endif; ?>
         </div>
     </section>
-    <?= View::render(Template::SidebarFollows, ['follows' => $data['follows']]) ?>
+    <?php if ($moi !== null): ?>
+        <?= View::render(Template::SidebarFollows, ['follows' => $data['follows']]) ?>
+    <?php endif; ?>
 </aside>
 
 <main>
@@ -38,7 +40,11 @@ $moi = $_SESSION['user'] ?? null;
         <div class="titlebar"><span>Touites affichés</span></div>
         <div class="panel" style="padding:0">
             <?php if (empty($data['touites'])): ?>
-                <div class="empty">Aucun touite.</div>
+                <div class="empty">
+                    <?= $data['tag'] === null
+                        ? 'Votre mur est vide. Suivez des personnes ou abonnez-vous à des tags pour voir leurs touites ici.'
+                        : 'Aucun touite pour ce tag.' ?>
+                </div>
             <?php endif; ?>
             <?php foreach ($data['touites'] as $touite): ?>
                 <?= View::render(Template::Touite, ['touite' => $touite, 'page' => $data['page']]) ?>  <!-- MODIFIÉ -->
@@ -54,5 +60,5 @@ $moi = $_SESSION['user'] ?? null;
 </main>
 
 <aside>
-    <?= View::render(Template::SidebarTags, ['tags' => $data['tags']]) ?>
+    <?= View::render(Template::TagPanel, ['tags' => $data['tags'], 'tq' => $data['tq'], 'retour' => $data['retour']]) ?>
 </aside>

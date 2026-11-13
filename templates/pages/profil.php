@@ -10,7 +10,6 @@ use touiteur\render\Template;
  *   page, pages : pagination
  *   tags    : tags les plus utilisés par cet utilisateur
  *   follows : (optionnel) abonnements de cet utilisateur
- *   (voir ProfilAction pour la construction de ces données)
  */
 $u = $data['user'];
 $initiales = mb_strtoupper(mb_substr($u['nom'], 0, 2));
@@ -45,9 +44,13 @@ $initiales = mb_strtoupper(mb_substr($u['nom'], 0, 2));
                 <?php if ($u['est_moi']): ?>
                     <button type="button">Modifier le profil</button>
                 <?php else: ?>
-                    <button type="button" class="<?= $u['suivi'] ? 'on' : '' ?>">
-                        <?= $u['suivi'] ? 'Abonné ✓' : 'S\'abonner' ?>
-                    </button>
+                    <form method="post" action="index.php?action=suivre">
+                        <input type="hidden" name="id_suivi" value="<?= View::e($u['handle']) ?>">
+                        <input type="hidden" name="retour" value="<?= View::e('index.php?action=profil&user=' . urlencode($u['handle'])) ?>">
+                        <button type="submit" class="<?= $u['suivi'] ? 'on' : '' ?>">
+                            <?= $u['suivi'] ? 'Abonné ✓' : 'S\'abonner' ?>
+                        </button>
+                    </form>
                 <?php endif; ?>
             </div>
         </div>

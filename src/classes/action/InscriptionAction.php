@@ -3,7 +3,7 @@
 namespace touiteur\action;
 
 use touiteur\render\Template;
-use touiteur\exceptions\{PseudoAlreadyExists, AlreadyHaveAccount, AuthException};
+use touiteur\exceptions\{PseudoAlreadyExists, AlreadyHaveAccount};
 use touiteur\repository\TouiteurRepository;
 
 class InscriptionAction extends Action{

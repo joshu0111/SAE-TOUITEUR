@@ -1,7 +1,7 @@
 <?php
 /*
- * Page de connexion.
- * Données attendues dans $data (fournies par l'action Connexion) :
+ * Page de connexion
+ * Donnee attendues dans $data :
  *   erreur     : ?string  message d'erreur à afficher (null si aucune)
  *   email      : string   email saisi, pour le pré-remplir après un échec
  */

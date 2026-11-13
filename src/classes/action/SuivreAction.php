@@ -18,12 +18,9 @@ class SuivreAction extends Action {
                 $repo->suivreUtilisateur($user['id'], $cible);
             }
         }
-        $retour = $_POST['retour'] ?? '';
 
-        if (!preg_match('#^index\.php\?#', $retour)) {
-            $retour = 'index.php?action=home';
-        }
-        header('Location: ' . $retour);
+        $retour = $this->retourValide($_POST['retour'] ?? '');
+        header('Location: ' . $retour . $this->ancre($_POST['ancre'] ?? ''));
         exit;
     }
 }

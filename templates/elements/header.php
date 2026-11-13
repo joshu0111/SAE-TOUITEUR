@@ -13,10 +13,11 @@ $utilisateur = $_SESSION['user'] ?? null;
         <nav class="nav">
             <a href="index.php?action=home" class="on-link">Accueil</a>
             <a href="index.php?action=explorer">Explorer</a>
-            
+
             <?php if ($utilisateur !== null): ?>
                 <?php if (($utilisateur['role'] ?? 'user') === 'admin'): ?>
                     <a href="index.php?action=influenceurs">Influenceurs</a>
+                    <a href="index.php?action=tendances">Tendances</a>
                 <?php endif; ?>
                 <a href="index.php?action=profil">Mon profil</a>
                 <a href="index.php?action=deconnexion">Déconnexion</a>
@@ -24,6 +25,9 @@ $utilisateur = $_SESSION['user'] ?? null;
                 <a href="index.php?action=connexion">Connexion</a>
             <?php endif; ?>
         </nav>
-        <input class="search" type="search" placeholder="Rechercher #tag ou @user">
+        <form class="header-search" method="get" action="index.php">
+            <input type="hidden" name="action" value="recherche">
+            <input class="search" type="search" name="q" placeholder="Rechercher #tag ou @user" autocomplete="off">
+        </form>
     </div>
 </header>

@@ -39,7 +39,7 @@ foreach ($liste as $t) {
                 </a>
                 <span class="handle">voir les touites</span>
 
-                <div class="rank-count"><b><?= $nb ?></b><?= $nb > 1 ? 'mentions' : 'mention' ?></div>
+                <div class="rank-count"><b><?= $nb ?></b> <?= $nb > 1 ? 'mentions' : 'mention' ?></div>
                 <div class="rank-bar"><span style="width: <?= $pct ?>%"></span></div>
             </article>
         <?php endforeach; ?>

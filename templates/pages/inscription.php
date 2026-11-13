@@ -1,13 +1,13 @@
 <?php
 /*
- * Page d'inscription.
- * Données attendues dans $data (fournies par l'action Inscription) :
+ * Page d'inscription
+ * Donnees attendues dans $data :
  *   erreur     : ?string  message d'erreur global (null si aucun)
  *   pseudo     : string   pseudo saisi, pour le pré-remplir après un échec
  *   nom        : string   nom saisi
  *   prenom     : string   prénom saisi
  *   email      : string   email saisi
- * Le mot de passe n'est jamais ré-affiché.
+ * Le mot de passe n'est jamais ré-affiché
  */
 use touiteur\render\View;
 

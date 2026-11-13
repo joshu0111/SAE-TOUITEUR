@@ -95,7 +95,7 @@ class TouiteurRepository
              ORDER BY nb_abonnes DESC, u.id_utilisateur ASC"
         )->fetchAll();
     }
-    
+
     /**
      * Tags utilises dans au moins un touite, avec leur nombre de mentions, par ordre croissant
      */
@@ -106,7 +106,7 @@ class TouiteurRepository
              FROM TAG tg
              JOIN CONTENIR c ON c.id_tag = tg.id_tag
              GROUP BY tg.id_tag, tg.libelle
-             ORDER BY nb ASC, tg.libelle ASC"
+             ORDER BY nb DESC, tg.libelle ASC"
         )->fetchAll();
     }
 
@@ -142,7 +142,7 @@ class TouiteurRepository
     /**
      * Renvoie les touites du plus recent au plus ancien, sous la forme attendue par le template touite
      */
-    public function getTouites(int $limit, int $offset, ?string $idUser = null): array   // MODIFIÉ (3e parametre)
+    public function getTouites(int $limit, int $offset, ?string $idUser = null): array
     {
         // ma_note = evaluation de l'utilisateur connecte (1, -1 ou NULL s'il n'a pas encore evalue)
         $st = $this->pdo->prepare(
@@ -170,17 +170,10 @@ class TouiteurRepository
     }
 
     /**
-     * Enregistre le like (+1) ou le dislike (-1) d'un utilisateur sur un touite.     // NOUVEAU
-     * La note du touite est mise a jour par le trigger trg_evaluation_insert.
-     * @return bool true si l'evaluation est enregistree, false si l'utilisateur
-     *              a deja evalue ce touite (ou si le touite n'existe pas)
-     */
-    /**
-     * Vote d'un utilisateur sur un touite :
-     * - pas encore voté     -> ajout
-     * - même vote re-cliqué -> retrait
-     * - vote opposé         -> changement d'avis
-     * La note est mise à jour par les triggers.
+     * Enregistre le like (+1) ou le dislike (-1) d'un utilisateur sur un touite
+     * La note du touite est mise a jour par le trigger trg_evaluation_insert
+     * @return bool true = evaluation enregistree,
+     *              false = si l'utilisateur a deja evaluer ou touite inexistant
      */
     public function evaluerTouite(Evaluation $e): void
     {
@@ -210,28 +203,56 @@ class TouiteurRepository
     /**
      * Methode qui permet de compter les touites
      */
-
     public function compterTouites(): int
     {
         return (int) $this->pdo->query("SELECT COUNT(*) FROM TOUITE")->fetchColumn();
     }
 
-    public function getTouiteById(int $id): ?array
-{
-    $st = $this->pdo->prepare(
-        "SELECT LOWER(CONCAT(u.prenom, ' ', u.nom)) AS auteur,
-                t.id_touite,
-                u.id_utilisateur AS pseudo,
-                DATE_FORMAT(t.date_publication, '%d/%m/%Y %H:%i') AS date,
-                t.contenu AS contenu
-         FROM TOUITE t
-         JOIN UTILISATEUR u ON u.id_utilisateur = t.id_utilisateur
-         WHERE t.id_touite = :id"
-    );
-    $st->execute([':id' => $id]);
-    $row = $st->fetch();
-    return $row ?: null;
-}
+    /**
+     * Un touite complet (auteur, date, contenu, image, note), avec le vote de $idUser
+     */
+    public function getTouiteById(int $id, ?string $idUser = null): ?array
+    {
+        $st = $this->pdo->prepare(
+            "SELECT LOWER(CONCAT(u.prenom, ' ', u.nom)) AS auteur,
+                    u.prenom, u.nom,
+                    t.id_touite,
+                    u.id_utilisateur AS pseudo,
+                    DATE_FORMAT(t.date_publication, '%d/%m/%Y à %H:%i') AS date,
+                    t.contenu AS contenu,
+                    t.note AS note,
+                    e.valeur AS ma_note,
+                    i.chemin_fichier AS image,
+                    i.description AS image_alt
+             FROM TOUITE t
+             JOIN UTILISATEUR u ON u.id_utilisateur = t.id_utilisateur
+             LEFT JOIN IMAGE i ON i.id_image = t.id_image
+             LEFT JOIN EVALUATION e ON e.id_touite = t.id_touite AND e.id_utilisateur = :moi
+             WHERE t.id_touite = :id"
+        );
+        $st->bindValue(':moi', $idUser);
+        $st->bindValue(':id', $id, PDO::PARAM_INT);
+        $st->execute();
+        return $st->fetch() ?: null;
+    }
+
+    /**
+     * Tags utilises dans un touite, avec leur nombre de mentions
+     */
+    public function getTagsDuTouite(int $id): array
+    {
+        $st = $this->pdo->prepare(
+            "SELECT tg.libelle, COUNT(c2.id_touite) AS nb
+             FROM CONTENIR c
+             JOIN TAG tg ON tg.id_tag = c.id_tag
+             LEFT JOIN CONTENIR c2 ON c2.id_tag = tg.id_tag
+             WHERE c.id_touite = :id
+             GROUP BY tg.id_tag, tg.libelle
+             ORDER BY tg.libelle"
+        );
+        $st->execute([':id' => $id]);
+        return $st->fetchAll();
+    }
 
     public function compterTouitesFiltreParTag(string $tag): int {
         $st = $this->pdo->prepare(
@@ -277,11 +298,9 @@ class TouiteurRepository
         return $st->fetchAll();
     }
 
-    public function getFollows() : array {
-        return $this->pdo->query("SELECT concat(nom, ' ', prenom) as nom,id_utilisateur as pseudo FROM UTILISATEUR")->fetchAll();
-
-    }
-
+    /*
+    * Recupere les tags (libelle) et le nombre de fois qu'il a ete utlise
+    * */
     public function getTags() : array  {
         return $this->pdo->query(
                 "SELECT t.libelle, COUNT(c.id_touite) AS nb
@@ -304,21 +323,29 @@ class TouiteurRepository
         return $st->fetch() ?: null;
     }
 
+    /* Nombre de touites par user */
     public function compterTouitesParUtilisateur(string $pseudo): int
     {
         return $this->compterPour("SELECT COUNT(*) FROM TOUITE WHERE id_utilisateur = :p", $pseudo);
     }
 
+    /**
+     * Nombre d'abonne a un user
+     */
     public function compterAbonnes(string $pseudo): int
     {
         return $this->compterPour("SELECT COUNT(*) FROM SUIVRE WHERE id_suivi = :p", $pseudo);
     }
 
+    /**
+     * Nombre d'abonnes a un compte
+     */
     public function compterAbonnements(string $pseudo): int
     {
         return $this->compterPour("SELECT COUNT(*) FROM SUIVRE WHERE id_suiveur = :p", $pseudo);
     }
 
+    /** Methode privee appelee par compterAbonnes et  compterAbonnements */
     private function compterPour(string $sql, string $pseudo): int
     {
         $st = $this->pdo->prepare($sql);
@@ -327,7 +354,7 @@ class TouiteurRepository
     }
 
     /**
-     * true si $suiveur suit $suivi
+     * True si $suiveur suit $suivi
      */
     public function suitUtilisateur(string $suiveur, string $suivi): bool
     {
@@ -346,6 +373,7 @@ class TouiteurRepository
              ON DUPLICATE KEY UPDATE id_suivi = id_suivi"
         )->execute([':suiveur' => $suiveur, ':suivi' => $suivi]);
     }
+
     /**
      * Methode qui permet d'enlever une personne qui suit une autre
      */
@@ -357,6 +385,9 @@ class TouiteurRepository
     }
 
 
+    /**
+     * Methode qui permet de recuperer tous les users avec pattern correspondant a recherche
+     */
     public function getUtilisateurs(string $recherche, ?string $idUser): array{
         // Échappe les caractères joker de LIKE pour qu'ils soient traites comme du texte
         $motif = '%' . addcslashes($recherche, '%_\\') . '%';
@@ -446,7 +477,10 @@ class TouiteurRepository
         return $st->fetchAll();
     }
 
-
+    /**
+     * Methode qui permet de verifier la connexion d'un user
+     * Renvoie le tableau avec les infos de l'user sans son mdp
+     */
     public function connexionUser(string $pseudo, string $pass) : array {
         $st = $this->pdo->prepare(
                 "SELECT id_utilisateur, prenom, nom, mdp, role
@@ -465,13 +499,16 @@ class TouiteurRepository
                 throw new IncorrectPassword();
             }
 
-
             // On retire le password du tableau
             unset($user['mdp']);
             return $user;
     }
 
-
+    /**
+     * Permet d'inscrire un user en verifiant que :
+     *  - pseudo n'est pas deja pris
+     *  - email non associe a un compte existant
+     */
     public function inscriptionUser(string $pseudo, string $nom, string $prenom, string $email, string $pass): void {
         // Le pseudo deja pris
         $st = $this->pdo->prepare("SELECT COUNT(*) FROM UTILISATEUR WHERE id_utilisateur = :pseudo");
@@ -512,5 +549,130 @@ class TouiteurRepository
         )->execute([':description' => $description, ':chemin' => $chemin]);
 
         return (int) $this->pdo->lastInsertId();
+    }
+
+    /**
+     * Tags suivis par un utilisateur avec nombre de mentions
+     */
+    public function getTagsSuivis(string $idUser): array
+    {
+        $st = $this->pdo->prepare(
+            "SELECT tg.libelle, COUNT(c.id_touite) AS nb
+             FROM ABONNEMENT a
+             JOIN TAG tg ON tg.id_tag = a.id_tag
+             LEFT JOIN CONTENIR c ON c.id_tag = tg.id_tag
+             WHERE a.id_utilisateur = :user
+             GROUP BY tg.id_tag, tg.libelle
+             ORDER BY tg.libelle"
+        );
+        $st->execute([':user' => $idUser]);
+        return $st->fetchAll();
+    }
+
+    /**
+     * Recherche parmi tous les tags avec indication de l'abonnement de $idUser
+     */
+    public function rechercherTags(string $recherche, string $idUser): array
+    {
+        // addcslashes() echappe les caracteres speciaux propres a SQL (%, _, \)
+        // pour eviter qu'ils ne soient interpretes comme des jokers si l'utilisateur les tapes
+        $motif = '%' . addcslashes($recherche, '%_\\\\') . '%';
+
+        $st = $this->pdo->prepare(
+            "SELECT tg.libelle,
+                    COUNT(c.id_touite) AS nb,
+                    EXISTS(SELECT 1 FROM ABONNEMENT a
+                           WHERE a.id_utilisateur = :moi AND a.id_tag = tg.id_tag) AS suivi
+             FROM TAG tg
+             LEFT JOIN CONTENIR c ON c.id_tag = tg.id_tag
+             WHERE tg.libelle LIKE :q
+             GROUP BY tg.id_tag, tg.libelle
+             ORDER BY nb DESC, tg.libelle
+             LIMIT 20"
+        );
+        $st->execute([':moi' => $idUser, ':q' => $motif]);
+        return $st->fetchAll();
+    }
+
+    /**
+     * Bascule l'abonnement d'un utilisateur a un tag
+     * @return ?bool true si abonne maintenant, false si desabonne, null si le tag n'existe pas
+     */
+    public function basculerAbonnementTag(string $idUser, string $libelle): ?bool
+    {
+        $st = $this->pdo->prepare("SELECT id_tag FROM TAG WHERE libelle = :libelle");
+        $st->execute([':libelle' => $libelle]);
+        $idTag = $st->fetchColumn();
+        if ($idTag === false) {
+            return null;
+        }
+        $idTag = (int) $idTag;
+
+        $retire = $this->pdo->prepare(
+            "DELETE FROM ABONNEMENT WHERE id_utilisateur = :user AND id_tag = :tag"
+        );
+        $retire->execute([':user' => $idUser, ':tag' => $idTag]);
+        if ($retire->rowCount() > 0) {
+            return false;
+        }
+
+        $this->pdo->prepare(
+            "INSERT INTO ABONNEMENT (id_utilisateur, id_tag, date_abonnement)
+             VALUES (:user, :tag, NOW())"
+        )->execute([':user' => $idUser, ':tag' => $idTag]);
+        return true;
+    }
+
+    /**
+     * Condition du mur :
+     *  -> touites des comptes suivis par $moi
+     *  ou
+     *  -> touites portant un tag suivi par $moi
+     */
+    private const CONDITION_MUR = "(t.id_utilisateur IN (SELECT s.id_suivi FROM SUIVRE s WHERE s.id_suiveur = :moi1)
+            OR t.id_touite IN (SELECT c.id_touite FROM CONTENIR c
+                               JOIN ABONNEMENT a ON a.id_tag = c.id_tag
+                               WHERE a.id_utilisateur = :moi2))";
+
+    /**
+     * Nombre de touites du mur de l'utilisateur
+     */
+    public function compterMur(string $moi): int
+    {
+        $st = $this->pdo->prepare("SELECT COUNT(*) FROM TOUITE t WHERE " . self::CONDITION_MUR);
+        $st->execute([':moi1' => $moi, ':moi2' => $moi]);
+        return (int) $st->fetchColumn();
+    }
+
+    /**
+     * Touites du mur de l'utilisateur du plus recent au plus ancien memes colonnes que getTouites
+     */
+    public function getMur(int $limit, int $offset, string $moi): array
+    {
+        $st = $this->pdo->prepare(
+            "SELECT LOWER(CONCAT(u.prenom, ' ', u.nom)) AS auteur,
+                    t.id_touite,
+                    u.id_utilisateur AS pseudo,
+                    DATE_FORMAT(t.date_publication, '%d/%m/%Y %H:%i') AS date,
+                    t.contenu AS contenu,
+                    t.note AS note,
+                    e.valeur AS ma_note,
+                    i.chemin_fichier AS image,
+                    i.description AS image_alt
+             FROM TOUITE t
+             JOIN UTILISATEUR u ON u.id_utilisateur = t.id_utilisateur
+             LEFT JOIN IMAGE i ON i.id_image = t.id_image
+             LEFT JOIN EVALUATION e ON e.id_touite = t.id_touite AND e.id_utilisateur = :moi3
+             WHERE " . self::CONDITION_MUR . "
+             ORDER BY t.date_publication DESC, t.id_touite DESC
+             LIMIT :limite OFFSET :decalage"
+        );
+        $st->bindValue(':moi1', $moi);
+        $st->bindValue(':moi2', $moi);
+        $st->bindValue(':moi3', $moi);
+        $st->bindValue(':limite', $limit, PDO::PARAM_INT);
+        $st->bindValue(':decalage', $offset, PDO::PARAM_INT);
+        $st->execute();
+        return $st->fetchAll();
     }
 }
